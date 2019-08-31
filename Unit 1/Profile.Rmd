@@ -1,0 +1,21 @@
+---
+title: "Data Science Profile"
+author: "R.M. Palmer"
+date: "8/26/2019"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## My Data Science Profile
+
+```{r}
+skills = c(1,2,2,3,5,5,4)
+labels = c("Vis","ML","Math","Stats","Computer","Comm","Domain")
+barplot(skills,names.arg = labels,main="Richard Profile")
+```
