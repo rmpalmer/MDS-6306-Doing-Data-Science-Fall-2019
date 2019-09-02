@@ -2,18 +2,28 @@
 title: "Unit 2"
 author: "Richard Palmer"
 date: "9/2/2019"
-output: powerpoint_presentation
+output:
+  powerpoint_presentation: default
+  ioslides_presentation: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## R Markdown
+```{r, echo =FALSE}
+# get libraries
+library(dplyr)
+library(ggplot2)
 
-This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+# load data
+BBall <- read.csv(file="PlayersBBall.csv")
+```
+## Question 1
+```{r}
+BBall %>% filter(position != '')  %>% ggplot() + geom_bar(mapping=aes(x=position)) + ggtitle("Count per position")
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+```
 
 ## Slide with Bullets
 
