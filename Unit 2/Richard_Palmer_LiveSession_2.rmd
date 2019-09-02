@@ -20,10 +20,25 @@ library(ggplot2)
 BBall <- read.csv(file="PlayersBBall.csv")
 ```
 ## Question 1
+Show the number of players per position
 ```{r}
 BBall %>% filter(position != '')  %>% ggplot() + geom_bar(mapping=aes(x=position)) + ggtitle("Count per position")
 
 ```
+
+## Question 2
+Compare the distribution of weight of centers with that of the weight of forwards
+```{r}
+BBall %>% filter(position == 'C' | position == 'F') %>% ggplot(aes(x=weight)) + geom_histogram() + ggtitle("Distribution of Weight for Centers and Forwards") + facet_wrap(~position)
+
+```
+
+## Question 3
+Compare the distribution of the height of centers with that of the height of forwards
+```{r}
+BBall %>% filter(position == 'C' | position == 'F') %>% ggplot(aes(x=height)) + geom_histogram() + ggtitle("Distribution of Height for Centers and Forwards") + facet_wrap(~position)
+```
+
 
 ## Slide with Bullets
 
