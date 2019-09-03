@@ -43,13 +43,31 @@ clean_pos <- function(pos) {
   return(c)
 }
 
+staying_power <- function(yrs) {
+  s <- "1"
+  if (yrs >= 20) {
+    s <- ">=20"
+  } else if (yrs > 15) {
+    s <- "15-19"
+  } else if (yrs > 10) {
+    s <- "10-14"
+  } else if (yrs > 5) {
+    s <- "5-9"
+  } else if (yrs > 1) {
+    s <- "2-4"
+  }
+  return (s)
+}
+
 # load data
 raw_ball <- read.csv(file="PlayersBBall.csv")
 
 # convert height to inches, compute years played
-BBall <- raw_ball %>% rowwise() %>% mutate(htc=as.character(height),height_inches=to_inches(htc)) %>% mutate(years_played = year_end - year_start + 1) %>% mutate(str_posn =clean_pos(position))
+BBall <- raw_ball %>% rowwise() %>% mutate(htc=as.character(height),height_inches=to_inches(htc)) %>% mutate(years_played = year_end - year_start + 1) %>% mutate(str_posn =clean_pos(position)) %>% mutate(sp = staying_power(years_played))
 
 BBall$position <- as.factor(BBall$str_posn)
+BBall$staying  <- as.factor(BBall$sp)
+BBall$staying  <- factor(BBall$staying,levels=c("1","2-4","5-9","10-14","15-19",">=20"))
 
 # education data
 raw_educ <- read.csv(file="Education_Income.csv")
@@ -113,15 +131,18 @@ plot_ly(BBall, x=~height_inches,y=~weight,z=~year_start,color=~position,size=1) 
 ## Question 9
 Visualize some new aspect of the data
 ```{r,echo=TRUE}
-BBall %>% ggplot(aes(x=year_start,xend=year_end,y=name)) + geom_dumbbell()
-BBall %>% arrange(year_start,year_end) %>% ggplot(aes(x=year_start,xend=year_end,y=name)) + geom_dumbbell()
-foo <- BBall %>% arrange(year_start,year_end)
-hist(BBall$year_start)
-hist(BBall$year_end)
-numeric_cols <- c("year_start","year_end","years_played","height_inches","weight")
-numeric_stats <- na.omit(BBall[numeric_cols])
-corr <- round(cor(numeric_stats),1)
-ggcorrplot(corr,hc.order=TRUE,type="lower",lab=TRUE,lab_size=3,method="circle")
+#BBall %>% ggplot(aes(x=year_start,xend=year_end,y=name)) + geom_dumbbell()
+#BBall %>% arrange(year_start,year_end) %>% ggplot(aes(x=year_start,xend=year_end,y=name)) + geom_dumbbell()
+#foo <- BBall %>% arrange(year_start,year_end)
+#hist(BBall$year_start)
+#hist(BBall$year_end)
+#numeric_cols <- c("year_start","year_end","years_played","height_inches","weight")
+#numeric_stats <- na.omit(BBall[numeric_cols])
+#corr <- round(cor(numeric_stats),1)
+#ggcorrplot(corr,hc.order=TRUE,type="lower",lab=TRUE,lab_size=3,method="circle")
+BBall %>% ggplot(aes(position)) + geom_bar(aes(fill=staying))
+BBall %>% ggplot(aes(staying)) + geom_bar(aes(fill=position))
+
 ```
 
 ## Question 10
