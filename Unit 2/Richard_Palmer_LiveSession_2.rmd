@@ -40,38 +40,38 @@ BBall %>% filter(position != '')  %>% ggplot() + geom_bar(mapping=aes(x=position
 
 ## Question 2
 Compare the distribution of weight of centers with that of the weight of forwards
-```{r}
+```{r,echo=TRUE}
 BBall %>% filter(position == 'C' | position == 'F') %>% ggplot(aes(x=weight)) + geom_histogram(bins=20) + ggtitle("Distribution of Weight for Centers and Forwards") + facet_wrap(~position)
 
 ```
 
 ## Question 3
 Compare the distribution of the height of centers with that of the height of forwards
-```{r}
+```{r,echo=TRUE}
 BBall %>% filter(position == 'C' | position == 'F') %>% ggplot(aes(x=height_inches)) + geom_histogram(bins=20) + ggtitle("Distribution of Height for Centers and Forwards") + facet_wrap(~position)
 ```
 
 ## Question 4
 Investigate distribution of height across all positions
-```{r}
+```{r,echo=TRUE}
 BBall %>% filter(position != "") %>% ggplot(aes(x=height_inches)) + geom_histogram(bins=20) + ggtitle("Distribution of Height for all positions") + facet_wrap(~position)
 ```
 
 ## Question 5
 Investigate how a players height is related to his weight
-```{r}
+```{r,echo=TRUE}
 BBall %>% ggplot(aes(x=weight,y=height_inches)) + geom_point() + ggtitle("Height versus Weight");
 ```
 
 ## Question 6
 Is there any difference in height/weight relationship among positions?
-```{r}
+```{r,echo=TRUE}
 BBall %>% ggplot(aes(x=weight,y=height_inches,color=position)) + geom_point() + ggtitle("Height versus Weight");
 ```
 
 ## Question 7
 Is there any evidence that height has changed over the years?
-```{r}
+```{r,echo=TRUE}
 BBall %>% ggplot(aes(x=year_start,y=height_inches)) + geom_point() + ggtitle("Height versus starting year")
 ```
 ## Question 8
