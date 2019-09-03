@@ -16,8 +16,20 @@ knitr::opts_chunk$set(echo = FALSE)
 library(dplyr)
 library(ggplot2)
 
+# helpful function
+to_inches <- function(height) {
+  vals <- unlist(strsplit(x=height,split='-'))
+  feet   <- as.numeric(vals[1])
+  inches <-  as.numeric(vals[2])
+  return (12*feet + inches)
+}
+
 # load data
-BBall <- read.csv(file="PlayersBBall.csv")
+raw_data <- read.csv(file="PlayersBBall.csv")
+
+# convert height to inches
+BBall <- raw_data %>% rowwise() %>% mutate(htc=as.character(height),height_inches=to_inches(htc))
+
 ```
 ## Question 1
 Show the number of players per position
@@ -29,15 +41,41 @@ BBall %>% filter(position != '')  %>% ggplot() + geom_bar(mapping=aes(x=position
 ## Question 2
 Compare the distribution of weight of centers with that of the weight of forwards
 ```{r}
-BBall %>% filter(position == 'C' | position == 'F') %>% ggplot(aes(x=weight)) + geom_histogram() + ggtitle("Distribution of Weight for Centers and Forwards") + facet_wrap(~position)
+BBall %>% filter(position == 'C' | position == 'F') %>% ggplot(aes(x=weight)) + geom_histogram(bins=20) + ggtitle("Distribution of Weight for Centers and Forwards") + facet_wrap(~position)
 
 ```
 
 ## Question 3
 Compare the distribution of the height of centers with that of the height of forwards
 ```{r}
-BBall %>% filter(position == 'C' | position == 'F') %>% ggplot(aes(x=height)) + geom_histogram() + ggtitle("Distribution of Height for Centers and Forwards") + facet_wrap(~position)
+BBall %>% filter(position == 'C' | position == 'F') %>% ggplot(aes(x=height_inches)) + geom_histogram(bins=20) + ggtitle("Distribution of Height for Centers and Forwards") + facet_wrap(~position)
 ```
+
+## Question 4
+Investigate distribution of height across all positions
+```{r}
+BBall %>% filter(position != "") %>% ggplot(aes(x=height_inches)) + geom_histogram(bins=20) + ggtitle("Distribution of Height for all positions") + facet_wrap(~position)
+```
+
+## Question 5
+Investigate how a players height is related to his weight
+```{r}
+BBall %>% ggplot(aes(x=weight,y=height_inches)) + geom_point() + ggtitle("Height versus Weight");
+```
+
+## Question 6
+Is there any difference in height/weight relationship among positions?
+```{r}
+BBall %>% ggplot(aes(x=weight,y=height_inches,color=position)) + geom_point() + ggtitle("Height versus Weight");
+```
+
+## Question 7
+Is there any evidence that height has changed over the years?
+```{r}
+BBall %>% ggplot(aes(x=year_start,y=height_inches)) + geom_point() + ggtitle("Height versus starting year")
+```
+## Question 8
+3D plot of height versus weight, colored by position
 
 
 ## Slide with Bullets
