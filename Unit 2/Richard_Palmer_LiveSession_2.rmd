@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = FALSE)
 # get libraries
 library(dplyr)
 library(ggplot2)
+library(plotly)
 
 # helpful function
 to_inches <- function(height) {
@@ -33,8 +34,13 @@ BBall <- raw_ball %>% rowwise() %>% mutate(htc=as.character(height),height_inche
 # education data
 raw_educ <- read.csv(file="Education_Income.csv")
 education <- raw_educ %>% rowwise() %>% mutate(log_income = log(Income2005))
+education$Educ <- factor(education$Educ,levels=c("<12","12","13-15","16",">16"))
+
+
 # not the way to do it...
 # levels(education$Educ) <- c("<12","12","13-15","16",">16")
+#levels(education$Educ) <- factor(education$Educ,levels=c(1,5,2,3,4))
+#levels(education$Educ) <- ordered(education$Educ,levels=c("<12","12","13-15","16",">16"))
 
 ```
 ## Question 1
@@ -81,7 +87,8 @@ Is there any evidence that height has changed over the years?
 BBall %>% ggplot(aes(x=year_start,y=height_inches)) + geom_point() + ggtitle("Height versus starting year")
 ```
 ## Question 8
-3D plot of height versus weight, colored by position
+3D plot of height versus weight versus year, colored by position
+p <- plot_ly(BBall, x=~height_inches,y=~weight,z=~year_start,color=~position) %>% add_markers %>% layout(scene=list(xaxis=list(title="Height"),yaxis=list(title="Weight"),zaxis=list(title="Start Year")))
 
 ## Question 9
 Visualize some new aspect of the data
