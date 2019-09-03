@@ -5,6 +5,7 @@ date: "9/2/2019"
 output:
   powerpoint_presentation: default
   ioslides_presentation: default
+  beamer_presentation: default
 ---
 
 ```{r setup, include=FALSE}
@@ -81,91 +82,66 @@ education$Educ <- factor(education$Educ,levels=c("<12","12","13-15","16",">16"))
 ```
 ## Question 1
 Show the number of players per position
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 BBall %>% filter(position != '')  %>% ggplot() + geom_bar(mapping=aes(x=position)) + ggtitle("Count per position")
 
 ```
 
 ## Question 2
 Compare the distribution of weight of centers with that of the weight of forwards
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 BBall %>% filter(position == 'Ctr' | position == 'For') %>% ggplot(aes(x=weight)) + geom_histogram(bins=20) + ggtitle("Distribution of Weight for Centers and Forwards") + facet_wrap(~position)
 
 ```
 
 ## Question 3
 Compare the distribution of the height of centers with that of the height of forwards
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 BBall %>% filter(position == 'Ctr' | position == 'For') %>% ggplot(aes(x=height_inches)) + geom_histogram(bins=20) + ggtitle("Distribution of Height for Centers and Forwards") + facet_wrap(~position)
 ```
 
 ## Question 4
 Investigate distribution of height across all positions
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 BBall %>% filter(position != "") %>% ggplot(aes(x=height_inches)) + geom_histogram(bins=20) + ggtitle("Distribution of Height for all positions") + facet_wrap(~position)
 ```
 
 ## Question 5
 Investigate how a players height is related to his weight
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 BBall %>% ggplot(aes(x=weight,y=height_inches)) + geom_point() + ggtitle("Height versus Weight");
 ```
 
 ## Question 6
 Is there any difference in height/weight relationship among positions?
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 BBall %>% ggplot(aes(x=weight,y=height_inches,color=position)) + geom_point() + ggtitle("Height versus Weight");
 ```
 
 ## Question 7
 Is there any evidence that height has changed over the years?
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 BBall %>% ggplot(aes(x=year_start,y=height_inches)) + geom_point() + ggtitle("Height versus starting year")
 ```
 ## Question 8
 3D plot of height versus weight versus year, colored by position
-```{r,echo=TRUE}
-plot_ly(BBall, x=~height_inches,y=~weight,z=~year_start,color=~position,size=1) %>% add_markers %>% layout(scene=list(xaxis=list(title="Height"),yaxis=list(title="Weight"),zaxis=list(title="Start Year")))
+```{r,echo=FALSE}
+#plot_ly(BBall, x=~height_inches,y=~weight,z=~year_start,color=~position,size=1) %>% add_markers %>% layout(scene=list(xaxis=list(title="Height"),yaxis=list(title="Weight"),zaxis=list(title="Start Year")))
 ```
 
 ## Question 9
 Visualize some new aspect of the data
-```{r,echo=TRUE}
-#BBall %>% ggplot(aes(x=year_start,xend=year_end,y=name)) + geom_dumbbell()
-#BBall %>% arrange(year_start,year_end) %>% ggplot(aes(x=year_start,xend=year_end,y=name)) + geom_dumbbell()
-#foo <- BBall %>% arrange(year_start,year_end)
-#hist(BBall$year_start)
-#hist(BBall$year_end)
-#numeric_cols <- c("year_start","year_end","years_played","height_inches","weight")
-#numeric_stats <- na.omit(BBall[numeric_cols])
-#corr <- round(cor(numeric_stats),1)
-#ggcorrplot(corr,hc.order=TRUE,type="lower",lab=TRUE,lab_size=3,method="circle")
-BBall %>% ggplot(aes(position)) + geom_bar(aes(fill=staying))
-BBall %>% ggplot(aes(staying)) + geom_bar(aes(fill=position))
+```{r,echo=FALSE}
+BBall %>% ggplot(aes(position)) + geom_bar(aes(fill=staying)) + ggtitle("Distribution of staying power (years played), by position")
+BBall %>% ggplot(aes(staying)) + geom_bar(aes(fill=position)) + ggtitle("Number of players in each position, by years played")
 
 ```
 
 ## Question 10
 Test the claim that the distribution of income increases as the education level rises.
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 education %>% ggplot(aes(x=Educ,y=log_income)) + geom_boxplot()
 ```
 
-## Slide with Bullets
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
-
-## Slide with R Output
-
-```{r cars, echo = TRUE}
-summary(cars)
-```
-
-## Slide with Plot
-
-```{r pressure}
-plot(pressure)
-```
 
