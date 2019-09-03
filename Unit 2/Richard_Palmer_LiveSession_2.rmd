@@ -33,7 +33,7 @@ BBall <- raw_data %>% rowwise() %>% mutate(htc=as.character(height),height_inche
 ```
 ## Question 1
 Show the number of players per position
-```{r}
+```{r,echo=TRUE}
 BBall %>% filter(position != '')  %>% ggplot() + geom_bar(mapping=aes(x=position)) + ggtitle("Count per position")
 
 ```
