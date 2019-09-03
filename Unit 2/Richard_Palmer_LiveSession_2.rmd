@@ -25,10 +25,16 @@ to_inches <- function(height) {
 }
 
 # load data
-raw_data <- read.csv(file="PlayersBBall.csv")
+raw_ball <- read.csv(file="PlayersBBall.csv")
 
 # convert height to inches
-BBall <- raw_data %>% rowwise() %>% mutate(htc=as.character(height),height_inches=to_inches(htc))
+BBall <- raw_ball %>% rowwise() %>% mutate(htc=as.character(height),height_inches=to_inches(htc))
+
+# education data
+raw_educ <- read.csv(file="Education_Income.csv")
+education <- raw_educ %>% rowwise() %>% mutate(log_income = log(Income2005))
+# not the way to do it...
+# levels(education$Educ) <- c("<12","12","13-15","16",">16")
 
 ```
 ## Question 1
@@ -77,6 +83,14 @@ BBall %>% ggplot(aes(x=year_start,y=height_inches)) + geom_point() + ggtitle("He
 ## Question 8
 3D plot of height versus weight, colored by position
 
+## Question 9
+Visualize some new aspect of the data
+
+## Question 10
+Test the claim that the distribution of income increases as the education level rises.
+```{r,echo=TRUE}
+education %>% ggplot(aes(x=Educ,y=log_income)) + geom_boxplot()
+```
 
 ## Slide with Bullets
 
