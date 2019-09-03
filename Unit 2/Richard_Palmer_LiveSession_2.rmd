@@ -17,6 +17,7 @@ library(dplyr)
 library(ggplot2)
 library(plotly)
 library(ggalt)
+library(ggcorrplot)
 
 # helpful function
 to_inches <- function(height) {
@@ -26,11 +27,29 @@ to_inches <- function(height) {
   return (12*feet + inches)
 }
 
+clean_pos <- function(pos) {
+  c <-  ""
+  if (pos == "C") {
+    c <- "Ctr"
+  } else if (pos == "F") {
+    c <- "For"
+  } else if (pos == "G") {
+    c <- "Grd"
+  } else if ((pos == "C-F") | (pos == "F-C")) {
+    c <- "Ctr/For"
+  } else if ((pos == "F-G") | (pos == "G-F")) {
+    c <- "For/Grd"
+  }
+  return(c)
+}
+
 # load data
 raw_ball <- read.csv(file="PlayersBBall.csv")
 
-# convert height to inches
-BBall <- raw_ball %>% rowwise() %>% mutate(htc=as.character(height),height_inches=to_inches(htc))
+# convert height to inches, compute years played
+BBall <- raw_ball %>% rowwise() %>% mutate(htc=as.character(height),height_inches=to_inches(htc)) %>% mutate(years_played = year_end - year_start + 1) %>% mutate(str_posn =clean_pos(position))
+
+BBall$position <- as.factor(BBall$str_posn)
 
 # education data
 raw_educ <- read.csv(file="Education_Income.csv")
@@ -52,14 +71,14 @@ BBall %>% filter(position != '')  %>% ggplot() + geom_bar(mapping=aes(x=position
 ## Question 2
 Compare the distribution of weight of centers with that of the weight of forwards
 ```{r,echo=TRUE}
-BBall %>% filter(position == 'C' | position == 'F') %>% ggplot(aes(x=weight)) + geom_histogram(bins=20) + ggtitle("Distribution of Weight for Centers and Forwards") + facet_wrap(~position)
+BBall %>% filter(position == 'Ctr' | position == 'For') %>% ggplot(aes(x=weight)) + geom_histogram(bins=20) + ggtitle("Distribution of Weight for Centers and Forwards") + facet_wrap(~position)
 
 ```
 
 ## Question 3
 Compare the distribution of the height of centers with that of the height of forwards
 ```{r,echo=TRUE}
-BBall %>% filter(position == 'C' | position == 'F') %>% ggplot(aes(x=height_inches)) + geom_histogram(bins=20) + ggtitle("Distribution of Height for Centers and Forwards") + facet_wrap(~position)
+BBall %>% filter(position == 'Ctr' | position == 'For') %>% ggplot(aes(x=height_inches)) + geom_histogram(bins=20) + ggtitle("Distribution of Height for Centers and Forwards") + facet_wrap(~position)
 ```
 
 ## Question 4
@@ -88,7 +107,7 @@ BBall %>% ggplot(aes(x=year_start,y=height_inches)) + geom_point() + ggtitle("He
 ## Question 8
 3D plot of height versus weight versus year, colored by position
 ```{r,echo=TRUE}
-p <- plot_ly(BBall, x=~height_inches,y=~weight,z=~year_start,color=~position) %>% add_markers %>% layout(scene=list(xaxis=list(title="Height"),yaxis=list(title="Weight"),zaxis=list(title="Start Year")))
+plot_ly(BBall, x=~height_inches,y=~weight,z=~year_start,color=~position,size=1) %>% add_markers %>% layout(scene=list(xaxis=list(title="Height"),yaxis=list(title="Weight"),zaxis=list(title="Start Year")))
 ```
 
 ## Question 9
@@ -99,7 +118,10 @@ BBall %>% arrange(year_start,year_end) %>% ggplot(aes(x=year_start,xend=year_end
 foo <- BBall %>% arrange(year_start,year_end)
 hist(BBall$year_start)
 hist(BBall$year_end)
-
+numeric_cols <- c("year_start","year_end","years_played","height_inches","weight")
+numeric_stats <- na.omit(BBall[numeric_cols])
+corr <- round(cor(numeric_stats),1)
+ggcorrplot(corr,hc.order=TRUE,type="lower",lab=TRUE,lab_size=3,method="circle")
 ```
 
 ## Question 10
