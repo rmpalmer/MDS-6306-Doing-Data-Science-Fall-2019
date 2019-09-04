@@ -153,7 +153,7 @@ The Forwards and Guards are most likely to only play for one year.
 ## Question 10
 Test the claim that the distribution of income increases as the education level rises.
 ```{r,echo=knit_echo}
-education %>% ggplot(aes(x=Educ,y=log_income)) + geom_boxplot()
+education %>% ggplot(aes(x=Educ,y=log_income)) + geom_boxplot() + ggtitle("Distribution of log income, grouped by years of education")
 ```
 Visualy, it doea appear that the distribution of incomes increases with each successive group.
 
