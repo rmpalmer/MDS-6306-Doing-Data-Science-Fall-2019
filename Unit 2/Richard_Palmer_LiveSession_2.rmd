@@ -13,12 +13,17 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r, echo =FALSE}
+
+# need to set this to false for ppt, but fase for pdf
+knit_echo = FALSE
+
 # get libraries
 library(dplyr)
 library(ggplot2)
 library(plotly)
 library(ggalt)
 library(ggcorrplot)
+library(tidyr)
 
 # helpful function
 to_inches <- function(height) {
@@ -82,66 +87,71 @@ education$Educ <- factor(education$Educ,levels=c("<12","12","13-15","16",">16"))
 ```
 ## Question 1
 Show the number of players per position
-```{r,echo=FALSE}
+```{r,echo=knit_echo}
 BBall %>% filter(position != '')  %>% ggplot() + geom_bar(mapping=aes(x=position)) + ggtitle("Count per position")
-
 ```
+There are a great many more Guards and Forwards than Centers.
 
 ## Question 2
 Compare the distribution of weight of centers with that of the weight of forwards
-```{r,echo=FALSE}
-BBall %>% filter(position == 'Ctr' | position == 'For') %>% ggplot(aes(x=weight)) + geom_histogram(bins=20) + ggtitle("Distribution of Weight for Centers and Forwards") + facet_wrap(~position)
+```{r,echo=knit_echo}
+BBall %>% filter(position == 'Ctr' | position == 'For') %>% drop_na(weight) %>% ggplot(aes(x=weight)) + geom_histogram(bins=21) + ggtitle("Distribution of Weight for Centers and Forwards") + facet_wrap(~position)
 
 ```
+Centers seem to be somewhat taller than Forwards.
 
 ## Question 3
 Compare the distribution of the height of centers with that of the height of forwards
-```{r,echo=FALSE}
-BBall %>% filter(position == 'Ctr' | position == 'For') %>% ggplot(aes(x=height_inches)) + geom_histogram(bins=20) + ggtitle("Distribution of Height for Centers and Forwards") + facet_wrap(~position)
+```{r,echo=knit_echo}
+BBall %>% filter(position == 'Ctr' | position == 'For') %>% drop_na(height_inches) %>% ggplot(aes(x=height_inches)) + geom_histogram(bins=21) + ggtitle("Distribution of Height for Centers and Forwards") + facet_wrap(~position)
 ```
+Centers are somewhat taller than Forwards.
 
 ## Question 4
 Investigate distribution of height across all positions
-```{r,echo=FALSE}
-BBall %>% filter(position != "") %>% ggplot(aes(x=height_inches)) + geom_histogram(bins=20) + ggtitle("Distribution of Height for all positions") + facet_wrap(~position)
+```{r,echo=knit_echo}
+BBall %>% filter(position != "") %>% drop_na(height_inches) %>% ggplot(aes(x=height_inches)) + geom_histogram(bins=21) + ggtitle("Distribution of Height for all positions") + facet_wrap(~position)
 ```
+The distribution of height for Centers and Forwards is clearly larger than that of Guards.
 
 ## Question 5
 Investigate how a players height is related to his weight
-```{r,echo=FALSE}
-BBall %>% ggplot(aes(x=weight,y=height_inches)) + geom_point() + ggtitle("Height versus Weight");
+```{r,echo=knit_echo}
+BBall %>% drop_na(height_inches) %>% drop_na(weight) %>% ggplot(aes(x=weight,y=height_inches)) + geom_point() + ggtitle("Height versus Weight") + geom_jitter()
 ```
+There is clearly a strong, apparently linear relationship between weight and height.  There is more variation in weight for taller players.
+
 
 ## Question 6
 Is there any difference in height/weight relationship among positions?
-```{r,echo=FALSE}
-BBall %>% ggplot(aes(x=weight,y=height_inches,color=position)) + geom_point() + ggtitle("Height versus Weight");
+```{r,echo=knit_echo}
+BBall %>% drop_na(height_inches) %>% drop_na(weight) %>% ggplot(aes(x=weight,y=height_inches,color=position)) + geom_point() + ggtitle("Height versus Weight") + geom_jitter()
 ```
+It is difficult to identify a different trend of height to weight by position.  It might be that the slope is not so great for Centers as for Guards, but this effect might instead simply be a consequence of taller players being Centers.  
 
 ## Question 7
 Is there any evidence that height has changed over the years?
-```{r,echo=FALSE}
-BBall %>% ggplot(aes(x=year_start,y=height_inches)) + geom_point() + ggtitle("Height versus starting year")
+```{r,echo=knit_echo}
+BBall %>% drop_na(height_inches) %>% drop_na(year_start) %>% ggplot(aes(x=year_start,y=height_inches)) + geom_point() + ggtitle("Height versus starting year") + geom_jitter() + geom_smooth(method="lm")
 ```
+It does appear tha there has been an increase in the range of heights over the years.
 ## Question 8
 3D plot of height versus weight versus year, colored by position
-```{r,echo=FALSE}
+```{r,echo=knit_echo}
 #plot_ly(BBall, x=~height_inches,y=~weight,z=~year_start,color=~position,size=1) %>% add_markers %>% layout(scene=list(xaxis=list(title="Height"),yaxis=list(title="Weight"),zaxis=list(title="Start Year")))
 ```
 
 ## Question 9
-Visualize some new aspect of the data
-```{r,echo=FALSE}
+- Colored by staying power (years played)
+```{r,echo=knit_echo}
 BBall %>% ggplot(aes(position)) + geom_bar(aes(fill=staying)) + ggtitle("Distribution of staying power (years played), by position")
-BBall %>% ggplot(aes(staying)) + geom_bar(aes(fill=position)) + ggtitle("Number of players in each position, by years played")
-
-```
+``` 
+The Forwards and Guards are most likely to only play for one year.
 
 ## Question 10
 Test the claim that the distribution of income increases as the education level rises.
-```{r,echo=FALSE}
+```{r,echo=knit_echo}
 education %>% ggplot(aes(x=Educ,y=log_income)) + geom_boxplot()
 ```
-
-
+Visualy, it doea appear that the distribution of incomes increases with each successive group.
 
