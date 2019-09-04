@@ -2,17 +2,19 @@
 title: "Unit 2"
 author: "Richard Palmer"
 date: "9/2/2019"
+always_allow_html: yes
 output:
   powerpoint_presentation: default
   ioslides_presentation: default
   beamer_presentation: default
+  
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-```{r, echo =FALSE}
+```{r, echo =TRUE}
 
 # need to set this to true for ppt, but false for pdf
 knit_echo = TRUE
@@ -138,7 +140,7 @@ It does appear tha there has been an increase in the range of heights over the y
 ## Question 8
 3D plot of height versus weight versus year, colored by position
 ```{r,echo=knit_echo}
-#plot_ly(BBall, x=~height_inches,y=~weight,z=~year_start,color=~position,size=1) %>% add_markers %>% layout(scene=list(xaxis=list(title="Height"),yaxis=list(title="Weight"),zaxis=list(title="Start Year")))
+plot_ly(BBall, x=~height_inches,y=~weight,z=~year_start,color=~position,size=1) %>% add_markers %>% layout(scene=list(xaxis=list(title="Height"),yaxis=list(title="Weight"),zaxis=list(title="Start Year")))
 ```
 
 ## Question 9
