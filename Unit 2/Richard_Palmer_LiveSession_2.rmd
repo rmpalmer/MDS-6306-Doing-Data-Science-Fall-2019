@@ -14,8 +14,8 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r, echo =FALSE}
 
-# need to set this to false for ppt, but fase for pdf
-knit_echo = FALSE
+# need to set this to true for ppt, but false for pdf
+knit_echo = TRUE
 
 # get libraries
 library(dplyr)
