@@ -1,0 +1,82 @@
+---
+title: "Pre LiveSession 3"
+author: "Richard Palmer"
+date: "9/8/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(GGally)
+library(dplyr)
+library(ggplot2)
+
+```
+
+## Part 1
+
+Load the data and select positions of interest
+```{r}
+# function to convert height to numeric inches
+to_inches <- function(height) {
+  vals <- unlist(strsplit(x=height,split="'"))
+  feet   <- as.numeric(vals[1])
+  inches <-  as.numeric(vals[2])
+  return (12*feet + inches)
+}
+# function to convert string weight to integer
+to_pounds <- function(weight) {
+  vals <- unlist(strsplit(x=weight,split="lbs"))
+  lbs = as.numeric(vals[1])
+  return (lbs)
+}
+
+# function to convert weight to numeric pounds
+
+fifa_raw <- read.csv("FIFA Players.csv")
+fifa_all <- fifa_raw %>% rowwise() %>% mutate(height_inches = to_inches(toString(Height)), weight_pounds = to_pounds(toString(Weight)))
+
+fifa_lm_lf <- fifa_all %>% filter(Position == 'LF' | Position == 'LM')
+fifa_lm_lf$Position <- droplevels(fifa_lm_lf$Position)
+```
+
+plot Acceleration and Agility versus Position
+```{r}
+fifa_lm_lf %>% select(Position,Acceleration,Agility) %>% ggpairs(aes(color=Position))
+```
+### T-test
+
+- Hypotheses
+
+H0: The mean of agility for left midfielders is the same as that for left forwards.
+Ha: The mean of agiliety for left midfielders is different from that for left forwards.
+
+- Critical Value
+
+
+
+- Test statistic
+
+- p-value
+
+- Accept/Reject
+
+- Conclusion
+
+### Are the assumptions met?
+
+- Normality
+
+- equal variance
+
+- independence
+
+## Part 2
+
+
+
+## Takeaways/Questions
+
+### Performance
+
+I wonder how efficient dplyr is.  Am I making lots of copies of data in memory when I have a long string of functions?
