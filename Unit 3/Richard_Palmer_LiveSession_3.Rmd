@@ -1,0 +1,139 @@
+---
+title: "Pre LiveSession 3"
+author: "Richard Palmer"
+date: "9/8/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(GGally)
+library(dplyr)
+library(ggplot2)
+library(purrr)
+
+```
+
+## Part 1
+
+Load the data 
+```{r}
+
+fifa_raw <- read.csv("FIFA Players.csv")
+
+```
+
+Select two positions of interest and re-create the position factor with only those two
+
+```{r}
+fifa_lm_lf <- fifa_raw %>% filter(Position == 'LF' | Position == 'LM')
+fifa_lm_lf$Position <- droplevels(fifa_lm_lf$Position)
+```
+
+plot Acceleration and Agility versus Position
+```{r}
+fifa_lm_lf %>% select(Position,Acceleration,Agility) %>% ggpairs(aes(color=Position))
+```
+### T-test
+
+- Hypotheses
+
+H0: The mean of agility for left midfielders is the same as that for left forwards.
+Ha: The mean of agility for left midfielders is different from that for left forwards.
+
+- Critical Value
+
+```{r}
+lm_players <- fifa_all %>% filter(Position == 'LM') 
+lf_players <- fifa_all %>% filter(Position == 'LF')
+result <- t.test(lm_players$Agility, lf_players$Agility, var.equal = TRUE)
+result
+```
+
+- Test statistic
+
+- p-value
+
+- Accept/Reject
+
+- Conclusion
+
+### Are the assumptions met?
+
+```{r}
+```
+- Normality
+
+- equal variance
+
+- independence
+
+## Part 2
+
+Useful functions for EDA
+```{r}
+# function to convert height to numeric inches
+to_inches <- function(height) {
+  vals <- unlist(strsplit(x=height,split="'"))
+  feet   <- as.numeric(vals[1])
+  inches <-  as.numeric(vals[2])
+  return (12*feet + inches)
+}
+# function to convert string weight to integer
+to_pounds <- function(weight) {
+  vals <- unlist(strsplit(x=weight,split="lbs"))
+  lbs = as.numeric(vals[1])
+  return (lbs)
+}
+# function to convert string to numeric value of euros
+# nothing has a value 
+to_euros <- function(value) {
+  num <- sub(" ","",sub("K","000",sub("M","000000",sub("€","",value))))
+  return(as.numeric(num))
+}
+```
+
+Convert monetary fields as well as height and weight to numeric values
+```{r}
+fifa_all <- fifa_raw %>% rowwise() %>% 
+  mutate(height_inches = to_inches(toString(Height)),
+         weight_pounds = to_pounds(toString(Weight)),
+         wage_euros    = to_euros(toString(Wage)),
+         value_euros   = to_euros(toString(Value))) %>%
+  mutate(log_wage = log(max(1,wage_euros)), 
+         log_value = log(max(1,value_euros)))
+```
+
+Quick view of distributions of many continuous varibles.  
+
+```{r}
+fifa_all %>% keep(is.numeric) %>% gather() %>% ggplot(aes(x=value)) +geom_histogram() + facet_wrap(~key,scales="free") + geom_density()
+
+```
+
+Look more closely at Value
+```{r}
+fifa_all %>% select(log_value) %>% ggplot() + geom_histogram(aes(x=log_value)) + ggtitle("Histogram of log Value")
+```
+
+it seems that there are three clusters of players by value
+```{r}
+value_cluster <- cut(fifa_all$log_value,breaks=c(0,7.5,14,20),labels=c("low","mid","high"))
+fifa_refined <- fifa_all %>% mutate(value_cluster = value_cluster)
+```
+
+## Takeaways/Questions
+
+### discovered new functions
+
+Here is a very useful function from tidyr: gather()
+
+gather() will convert a selection of columns into two columns: a key and a value. The key contains the names of the original columns, and the value contains the data held in the columns. If we don’t specify any arguments for gather(), it will convert ALL columns in our data frame into key-value pairs. 
+
+And keep(), from purrr:
+
+keep() will take our data frame (as the first argument/via a pipe), and apply a predicate function to each of its columns. Columns that return TRUE in the function will be kept, while others will be dropped. 
+
+### Performance
+
+I wonder how efficient dplyr is.  Am I making lots of copies of data in memory when I have a long string of functions connected by pipelines?  
