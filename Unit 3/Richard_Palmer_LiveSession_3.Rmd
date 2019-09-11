@@ -149,13 +149,53 @@ fifa_all %>% ggplot() + geom_histogram(aes(x=log_value)) + ggtitle("Histogram of
 
 What positions are of most value?
 
-Average Wage by nationality?
+Mean Wage by nationality?
+```{r}
+fifa_wage = fifa_all %>% filter(!is.na(wage_euros) & !is.na(Nationality)) %>% group_by(Nationality) %>% summarise(mean_wage = mean(wage_euros)) %>% arrange(mean_wage) %>% print()
+# order the nationalities
+fifa_wage$Nationality <- factor(fifa_wage$Nationality,level=fifa_wage$Nationality[order(fifa_wage$mean_wage)])
+# column plot of re-ordered results
+fifa_wage %>% ggplot(aes(x=Nationality,y=mean_wage)) + geom_col() + ggtitle("Mean Wage by Nationality")
+head(fifa_wage,10) %>% ggplot(aes(x=Nationality,y=mean_wage)) + geom_col() + ggtitle("Mean Wage by Nationality (low end)")
+tail(fifa_wage,10) %>% ggplot(aes(x=Nationality,y=mean_wage)) + geom_col() + ggtitle("Mean Wage by Nationality (high end)")
+```
 
 it seems that there are three clusters of players by value
 ```{r}
-#fifa_all %>% rowwise() %>% mutate(value_factor = #cut(log_value,breaks=c(0,7.5,14,20),labels=c("low","mid","high"))) %>% #ggplot(aes(x=height_inches,y=weight_pounds)) + geom_point() + facet_wrap(value_factor) + #ggtitle("weight to height by value factor")
+
+fifa_all$value_class <- cut(fifa_all$log_value,breaks=c(0,7.5,14,20),labels=c("low","mid","high"))
 ```
 
+
+```{r}
+fifa_all %>% select(value_class,Agility,) %>% ggpairs(aes(color=value_class))
+```
+
+Mean Value by Position?
+```{r}
+fifa_value = fifa_all %>% filter(!is.na(value_euros) & !is.na(Position)) %>% group_by(Position) %>% summarise(mean_value = mean(value_euros)) %>% arrange(mean_value) %>% print()
+# order the positions by value
+fifa_value$Position <- factor(fifa_value$Position,level=fifa_value$Position[order(fifa_value$mean_value)])
+# column plot of re-ordered results
+fifa_value %>% ggplot(aes(x=Position,y=mean_value)) + geom_col() + ggtitle("Mean Value by position")
+head(fifa_value,10) %>% ggplot(aes(x=Position,y=mean_value)) + geom_col() + ggtitle("Mean Value by Position (low end)")
+head(fifa_value,10) %>% print()
+tail(fifa_value,10) %>% ggplot(aes(x=Position,y=mean_value)) + geom_col() + ggtitle("Mean Value by Position (high end)")
+tail(fifa_value,10) %>% print()
+```
+
+Mean Wage by position
+```{r}
+fifa_wage = fifa_all %>% filter(!is.na(wage_euros) & !is.na(Position)) %>% group_by(Position) %>% summarise(mean_wage = mean(wage_euros)) %>% arrange(mean_wage) %>% print()
+# order the positions by wage
+fifa_wage$Position <- factor(fifa_wage$Position,level=fifa_wage$Position[order(fifa_wage$mean_wage)])
+# column plot of re-ordered results
+fifa_wage %>% ggplot(aes(x=Position,y=mean_wage)) + geom_col() + ggtitle("Mean wage by position")
+head(fifa_wage,10) %>% ggplot(aes(x=Position,y=mean_wage)) + geom_col() + ggtitle("Mean wage by Position (low end)")
+head(fifa_wage,10) %>% print()
+tail(fifa_wage,10) %>% ggplot(aes(x=Position,y=mean_wage)) + geom_col() + ggtitle("Mean wage by Position (high end)")
+tail(fifa_wage,10) %>% print()
+```
 
 ## Takeaways/Questions
 
