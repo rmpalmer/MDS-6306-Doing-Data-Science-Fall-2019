@@ -11,6 +11,7 @@ library(GGally)
 library(dplyr)
 library(ggplot2)
 library(purrr)
+library(tidyr)
 
 ```
 
@@ -18,55 +19,75 @@ library(purrr)
 
 Load the data 
 ```{r}
-
 fifa_raw <- read.csv("FIFA Players.csv")
-
 ```
 
 Select two positions of interest and re-create the position factor with only those two
 
 ```{r}
-fifa_lm_lf <- fifa_raw %>% filter(Position == 'LF' | Position == 'LM')
+fifa_lm_lf <- fifa_raw %>% filter(Position == 'LM' | Position == 'LF')
 fifa_lm_lf$Position <- droplevels(fifa_lm_lf$Position)
+fifa_lm_lf$Position %>% summary()
 ```
 
-plot Acceleration and Agility versus Position
+### Plot Acceleration and Agility versus Position
 ```{r}
-fifa_lm_lf %>% select(Position,Acceleration,Agility) %>% ggpairs(aes(color=Position))
+fifa_lm_lf %>% select(Position,Acceleration,Agility) %>% ggpairs(aes(color=Position)) + ggtitle("Plot Accleration and Agility, separated by Position (LF or LM only)")
 ```
+
+Acceleration and Agility are positively correlated.  The Left Forwards have higher higher median agility and acceleration.  There are a fair number of Mid fielders with low agility and acceleration.  We must be careful in the comparison, since there are many fewer (15) forwards than midfielders (1095)
+
 ### T-test
 
-- Hypotheses
+- Step 1 Hypotheses
 
 H0: The mean of agility for left midfielders is the same as that for left forwards.
 Ha: The mean of agility for left midfielders is different from that for left forwards.
 
-- Critical Value
+- Step 2 The positive and negative Critical Values are:
 
 ```{r}
-lm_players <- fifa_all %>% filter(Position == 'LM') 
-lf_players <- fifa_all %>% filter(Position == 'LF')
+qt(c(.025, .975), df=nrow(fifa_lm_lf)-2) 
+```
+
+```{r}
+lm_players <- fifa_raw %>% filter(Position == 'LM') 
+lf_players <- fifa_raw %>% filter(Position == 'LF')
 result <- t.test(lm_players$Agility, lf_players$Agility, var.equal = TRUE)
 result
 ```
 
-- Test statistic
+- Step 3 Test statistic is `r result[1]$statistic`
 
-- p-value
+- Step 4 The p-value is `r result$p.value`
 
-- Accept/Reject
+- Step 5 Fail to Reject the null hypothesis
 
-- Conclusion
+- Step 6 Conclusion.  There is insufficient evidence to reject the null hypothesis that the LM and LF players have different mean agility values. A 95% confidence interval for the difference in mean agility is from `r result$conf.int[1]` to `r result$conf.int[2]`
 
 ### Are the assumptions met?
 
 ```{r}
 ```
-- Normality
+- Random sampling.  We have nothing to indicate that the data are other than a random sampling.
 
-- equal variance
+- Normality / Equal variance
 
-- independence
+We will do Q-Q plots and histograms of Agility 
+
+```{r}
+fifa_lm_lf %>% filter(Position=="LM") %>%
+ ggplot(aes(sample=Agility)) + stat_qq() + stat_qq_line() + ggtitle("Q-Q plot of Agility for LM")
+fifa_lm_lf %>% filter(Position=="LF") %>%
+ ggplot(aes(sample=Agility)) + stat_qq() + stat_qq_line() + ggtitle("Q-Q plot of Agility for LF")
+fifa_lm_lf %>% filter(Position=="LM") %>% ggplot(aes(x=Agility)) + geom_histogram() + ggtitle("Histogram of Agility for LM") + xlim(40,100)
+fifa_lm_lf %>% filter(Position=="LF") %>% ggplot(aes(x=Agility)) + geom_histogram() + ggtitle("Histogram of Agility for LF") + xlim(40,100)
+
+```
+
+The Q-Q plot for position LM shows some departure from Normality, and the histogram looks somewhat  normal.  Since there is a large number of observations, we will proceed.  For the LF position, there are far fewer observations, so we should proceed with caution.  It does appear that the distributions of the two positions have similar variance.
+
+- independence.  For agility, there is no reason to believe that the players' values are not independent of one another.
 
 ## Part 2
 
@@ -111,16 +132,30 @@ fifa_all %>% keep(is.numeric) %>% gather() %>% ggplot(aes(x=value)) +geom_histog
 
 ```
 
+Look more closely at Value versus Wage
+```{r}
+fifa_all %>% ggplot(aes(x=wage_euros,y=value_euros)) + geom_point() + ggtitle('Value versus Wage - absolute')
+
+fifa_all %>% ggplot(aes(x=wage_euros,y=log_value)) + geom_point() + ggtitle("Log Value vs Wage")
+```
+
+
+What distinguishes the lower cloud of Value from the upper?
+
 Look more closely at Value
 ```{r}
-fifa_all %>% select(log_value) %>% ggplot() + geom_histogram(aes(x=log_value)) + ggtitle("Histogram of log Value")
+fifa_all %>% ggplot() + geom_histogram(aes(x=log_value)) + ggtitle("Histogram of Log Value")
 ```
+
+What positions are of most value?
+
+Average Wage by nationality?
 
 it seems that there are three clusters of players by value
 ```{r}
-value_cluster <- cut(fifa_all$log_value,breaks=c(0,7.5,14,20),labels=c("low","mid","high"))
-fifa_refined <- fifa_all %>% mutate(value_cluster = value_cluster)
+#fifa_all %>% rowwise() %>% mutate(value_factor = #cut(log_value,breaks=c(0,7.5,14,20),labels=c("low","mid","high"))) %>% #ggplot(aes(x=height_inches,y=weight_pounds)) + geom_point() + facet_wrap(value_factor) + #ggtitle("weight to height by value factor")
 ```
+
 
 ## Takeaways/Questions
 
@@ -136,4 +171,6 @@ keep() will take our data frame (as the first argument/via a pipe), and apply a 
 
 ### Performance
 
-I wonder how efficient dplyr is.  Am I making lots of copies of data in memory when I have a long string of functions connected by pipelines?  
+I wonder how efficient dplyr is.  Am I making lots of copies of data in memory when I have a long string of functions connected by pipelines?
+
+What steps should I take to make these analyses as efficient as possible?
