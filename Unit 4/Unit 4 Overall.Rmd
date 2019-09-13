@@ -187,8 +187,13 @@ who %>%
 library(httr)
 library(jsonlite)
 
-username = "cc092ea39fffe74b69f12976f4bfcd22"
-password = "7a8adcf931edb0766ff36fbb0b5cc421"
+#username = "cc092ea39fffe74b69f12976f4bfcd22"
+#password = "7a8adcf931edb0766ff36fbb0b5cc421"
+
+# gmail account, 'it' + usual
+username = "OjZiNTdiNGZiODk4NjNhYjcyMzI3MmU3YmVhMjkwZWVl"
+password = "OjM5MDk5MDc0MDk1NDY3NjU0YzYzMmFiOWY4ZDQ2YzFm"
+
 
 base <- "https://api.intrinio.com/"
 endpoint <- "prices"
@@ -217,17 +222,23 @@ get_prices_df %>% ggplot(aes(x = date, y = adj_volume))+ geom_col() + ggtitle("A
 
 #twitteR
 
-api_key = "rkclWXRZYkZYZbdVdcvzP2ZcN "
-api_secret = "ymjMYAkXhXVAL2ci4vTKi3ZFKg72abSKlzBNZq0y6rkXXltsdY"
-access_token = "1105487041691815937-IIPDKMmlfGIuRvJgrRfCgiRLtQAfII"
-access_token_secret = "mafeLvPRrI8SKBvyq4SJVozfx2wDD0rRkOrASfCoRJUyy"
+#api_key = "rkclWXRZYkZYZbdVdcvzP2ZcN "
+#api_secret = "ymjMYAkXhXVAL2ci4vTKi3ZFKg72abSKlzBNZq0y6rkXXltsdY"
+#access_token = "1105487041691815937-IIPDKMmlfGIuRvJgrRfCgiRLtQAfII"
+#access_token_secret = "mafeLvPRrI8SKBvyq4SJVozfx2wDD0rRkOrASfCoRJUyy"
+
+# for @rmorrispalmer
+api_key = "KvdDxssfaUuwB88jb6lLPkxDT"
+api_secret = "oJTmCaOoe5YbtfvWRdAaZBXfdcnJJb56pDjJbASXkrape1pZfz"
+access_token = "980241876073746432-1pywVoZ8MghGwLGTFTla9AIfqive7eq"
+access_token_secret = "9eogOJRLwEvAc0a43SjTyD3k7ucGjTPieV9sz350da3gK"
 
 #Load twitteR
 library(twitteR)
 setup_twitter_oauth(api_key,api_secret,access_token,access_token_secret)
   
 #Get tweets
-tweets = searchTwitter("$appl", n = 10, lang = "en")
+tweets = searchTwitter("riley reid", n = 10, lang = "en")
 
 #Locations 
 trend = availableTrendLocations()
