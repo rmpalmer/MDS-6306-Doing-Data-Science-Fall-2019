@@ -7,6 +7,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
 ```
 
 #Example 1a
@@ -90,7 +92,7 @@ data_long %>% ggplot(aes(x = age, y = measurement, color = condition )) + geom_p
 data_long %>% group_by(condition) %>% summarize(meanAge = mean(as.numeric(age)))
 
 #filtering
-data_long %>% filter(condition = "Control") %>% ggplot(aes(x = age, y = measurement)) + geom_point()
+data_long %>% filter(condition == "Control") %>% ggplot(aes(x = age, y = measurement)) + geom_point()
 
 
 
