@@ -44,3 +44,4 @@ grep("toast", bfast$hp_desc)
 grepl("toast",bfast$hp_desc)
 
 sum(grepl("toast",bfast$hp_desc))
+
