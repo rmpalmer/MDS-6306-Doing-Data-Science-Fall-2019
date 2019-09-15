@@ -2,7 +2,9 @@
 title: "Pre LiveSession 3"
 author: "Richard Palmer"
 date: "9/8/2019"
-output: html_document
+output:
+  html_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -143,14 +145,14 @@ fifa_all %>% ggplot(aes(x=wage_euros,y=log_value)) + geom_point() + ggtitle("Log
 What distinguishes the lower cloud of Value from the upper?
 
 Look more closely at Value
-```{r}
+```{r,echo=TRUE}
 fifa_all %>% ggplot() + geom_histogram(aes(x=log_value)) + ggtitle("Histogram of Log Value")
 ```
 
 What positions are of most value?
 
 Mean Wage by nationality?
-```{r}
+```{r,echo=TRUE}
 fifa_wage = fifa_all %>% filter(!is.na(wage_euros) & !is.na(Nationality)) %>% group_by(Nationality) %>% summarise(mean_wage = mean(wage_euros)) %>% arrange(mean_wage) %>% print()
 # order the nationalities
 fifa_wage$Nationality <- factor(fifa_wage$Nationality,level=fifa_wage$Nationality[order(fifa_wage$mean_wage)])
@@ -172,7 +174,7 @@ fifa_all %>% select(value_class,Agility,) %>% ggpairs(aes(color=value_class))
 ```
 
 Mean Value by Position?
-```{r}
+```{r,echo=TRUE}
 fifa_value = fifa_all %>% filter(!is.na(value_euros) & !is.na(Position)) %>% group_by(Position) %>% summarise(mean_value = mean(value_euros)) %>% arrange(mean_value) %>% print()
 # order the positions by value
 fifa_value$Position <- factor(fifa_value$Position,level=fifa_value$Position[order(fifa_value$mean_value)])
@@ -185,7 +187,7 @@ tail(fifa_value,10) %>% print()
 ```
 
 Mean Wage by position
-```{r}
+```{r,echo=TRUE}
 fifa_wage = fifa_all %>% filter(!is.na(wage_euros) & !is.na(Position)) %>% group_by(Position) %>% summarise(mean_wage = mean(wage_euros)) %>% arrange(mean_wage) %>% print()
 # order the positions by wage
 fifa_wage$Position <- factor(fifa_wage$Position,level=fifa_wage$Position[order(fifa_wage$mean_wage)])
