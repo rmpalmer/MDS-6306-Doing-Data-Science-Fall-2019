@@ -23,12 +23,27 @@ library(RCurl) #getURL
 ```{r}
 
 # use XML package
-#restaurants <-   getURL("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%wFrestaurants.xml")
-#doc <- xmlParse(restaurants)
+# this leads to an error :-(
+rest1 <-   getURL("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%wFrestaurants.xml")
+doc <- xmlParse(rest1)
 
 # use rvest
-#hp <- read_html("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%wFrestaurants.xml")
+hp <- read_html("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%wFrestaurants.xml")
 
+#https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml
+#https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml
+#https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml
+
+restaurants_url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml"
+
+hp <- read_html(restaurants_url)
+hp_nameR <- html_nodes(hp,"name")
+hp_zipR  <- html_nodes(hp,"zipcode")
+hp_ccdR  <- html_nodes(hp,"councildistrict")
+hp_name  <- html_text(hp_nameR)
+hp_zip   <- html_text(hp_zipR)
+hp_ccd   <- html_text(hp_ccdR)
+my_restaurants <- data.frame(hp_name,hp_zip,hp_ccd)
 ```
 
 ## Part 2
