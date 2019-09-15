@@ -24,11 +24,11 @@ library(RCurl) #getURL
 
 # use XML package
 # this leads to an error :-(
-rest1 <-   getURL("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%wFrestaurants.xml")
-doc <- xmlParse(rest1)
+#rest1 <-   getURL("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%wFrestaurants.xml")
+#doc <- xmlParse(rest1)
 
 # use rvest
-hp <- read_html("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%wFrestaurants.xml")
+#hp <- read_html("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%wFrestaurants.xml")
 
 #https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml
 #https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml
@@ -37,14 +37,43 @@ hp <- read_html("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%wFrestaura
 restaurants_url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml"
 
 hp <- read_html(restaurants_url)
+```
+
+Parse the html and form a dataframe with name, zipcode, and Council District
+```{r}
 hp_nameR <- html_nodes(hp,"name")
 hp_zipR  <- html_nodes(hp,"zipcode")
 hp_ccdR  <- html_nodes(hp,"councildistrict")
 hp_name  <- html_text(hp_nameR)
 hp_zip   <- html_text(hp_zipR)
 hp_ccd   <- html_text(hp_ccdR)
-my_restaurants <- data.frame(hp_name,hp_zip,hp_ccd)
+all_restaurants <- data.frame(hp_name,hp_zip,hp_ccd)
 ```
+
+Look for sushi restaurants.
+```{r}
+sushi_indices <- grep("sushi",all_restaurants$hp_name,ignore.case=TRUE) 
+total_sushi <- length(sushi_indices)
+```
+
+There appear to be `r total_sushi` Sushi restaurants in Baltimore.
+
+Now look only downtown
+```{r}
+downtown_restaurants <- all_restaurants %>% filter(hp_ccd == 11)
+dt_sushi_indices <- grep("sushi",downtown_restaurants$hp_name,ignore.case=TRUE) 
+total_dt_sushi <- length(dt_sushi_indices)
+```
+
+There is/are `r total_dt_sushi` sushi restaurants downtown.  
+
+Make a barplot of number of restaurants by council district.
+```{r}
+ordered_ccds <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14")
+all_restaurants$hp_ccd <- factor(all_restaurants$hp_ccd,labels=ordered_ccds)
+all_restaurants %>% group_by(hp_ccd) %>% summarize(count=n()) %>% ggplot(aes(x=hp_ccd,y=count)) + geom_col() + ggtitle('Count of restaurants by City Council District')
+```
+
 
 ## Part 2
 
