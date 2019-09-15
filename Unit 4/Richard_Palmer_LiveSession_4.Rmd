@@ -7,5 +7,87 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(XML) #xml_Parse
+library(dplyr)
+library(tidyr)
+library(stringi)
+library(rvest) #html_table, html_node
+library(ggplot2)
+library(RCurl) #getURL
 ```
+
+## Part 1
+
+### Get xml data from cloudfront.net
+
+```{r}
+
+# use XML package
+#restaurants <-   getURL("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%wFrestaurants.xml")
+#doc <- xmlParse(restaurants)
+
+# use rvest
+#hp <- read_html("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%wFrestaurants.xml")
+
+```
+
+## Part 2
+
+Investigate the quantmod package.
+
+```{r}
+library('quantmod')
+```
+
+The quantmod package for R is designed to assist the quantitative trader in the development, testing, and deployment of statistically based trading models.
+It includes easy to use functions for fetching price data from Google, Yahoo, 
+The Federal Reserve, and others.  Although intended as a resource for packages
+that would automate trading, it can also be used to simple retrieve financial data.
+
+Fetch historical stock data for Hewlett-Packard.
+
+This function retrieves data into a special 'xts' object.
+The argument is the stock symbol, and the name of the resulting
+object is the same as that symbol.  It is easy to create a 
+data frame from the xts object.
+```{r}
+getSymbols('HPQ')
+hp_data = data.frame(HPQ)
+str(hp_data)
+summary(hp_data)
+```
+
+The quantmod package includes nice plotting functions.
+Plot price data using quantmod package
+```{r}
+chartSeries(HPQ, TA=NULL)
+```
+
+I would like to investigate how often HP stock closes on a high
+or on a low for the day.  Also, compute the 'closing percentage'
+as a number between 0 and 1.  Zero would mean it closes on the low
+for the day, 1 means it closes on the high for the day.
+
+```{r}
+hp_data <- hp_data %>% 
+  mutate(pr = HPQ.High - HPQ.Low) %>%
+  mutate(close_on_high = (HPQ.Close == HPQ.High)) %>%
+  mutate(close_on_low  = (HPQ.Close == HPQ.Low)) %>%
+  mutate(close_perc = (HPQ.Close - HPQ.Low)/pr)
+
+hp_high_closes = sum(hp_data$close_on_high)
+hp_low_closes = sum(hp_data$close_on_low)
+hp_high_close_rate = 100*hp_high_closes/nrow(hp_data)
+hp_low_close_rate = 100*hp_low_closes/nrow(hp_data)
+```
+
+Plot a histogram of the 'closing percentage'
+```{r}
+hp_data %>% ggplot(aes(x=close_perc)) + geom_histogram() + ggtitle('Histogram of closing percentage')
+```
+
+
+It seems that the stock closes on a high only `r hp_high_close_rate` percent of the time, and that it closes on a low `r hp_low_close_rate` percent of the time.
+
+
 
