@@ -57,6 +57,14 @@ str(hp_data)
 summary(hp_data)
 ```
 
+One unfortunate quirk of the way these objects are named arises
+when a stock symbol is not simply alphanumeric.  For instance,
+for Royal Dutch Shell, the stock symbol is RDS-A.  This creates
+an object called RDS-A.  It is difficult to do anything with this
+object, since R parses the name of the object as a subtraction
+of two other objects.  I believe that quantmod has a way to use
+custom names, but it was not clear how to use it.
+
 The quantmod package includes nice plotting functions.
 Plot price data using quantmod package
 ```{r}
@@ -70,10 +78,11 @@ for the day, 1 means it closes on the high for the day.
 
 ```{r}
 hp_data <- hp_data %>% 
-  mutate(pr = HPQ.High - HPQ.Low) %>%
+  mutate(trade_range = HPQ.High - HPQ.Low) %>%
+  mutate(price_range = HPQ.Close - HPQ.Open) %>%
   mutate(close_on_high = (HPQ.Close == HPQ.High)) %>%
   mutate(close_on_low  = (HPQ.Close == HPQ.Low)) %>%
-  mutate(close_perc = (HPQ.Close - HPQ.Low)/pr)
+  mutate(close_perc = (HPQ.Close - HPQ.Low)/trade_range)
 
 hp_high_closes = sum(hp_data$close_on_high)
 hp_low_closes = sum(hp_data$close_on_low)
@@ -86,8 +95,18 @@ Plot a histogram of the 'closing percentage'
 hp_data %>% ggplot(aes(x=close_perc)) + geom_histogram() + ggtitle('Histogram of closing percentage')
 ```
 
+From the bimodal distribution histogram, it seems that the closing price is likely to be close to the 
+low for the day or to the high for the day.
+However, the stock closes exactly on a high only `r hp_high_close_rate` percent of the time, and that it closes exactly on a low `r hp_low_close_rate` percent of the time.
 
-It seems that the stock closes on a high only `r hp_high_close_rate` percent of the time, and that it closes on a low `r hp_low_close_rate` percent of the time.
+Look at a histogram of price ranges.  Compare the size of ups with the size of the downs.
+```{r}
+hp_data %>% ggplot(aes(price_range)) + geom_histogram() + ggtitle('Histogram of price changes')
+```
 
+Look at a QQ plot of the price changes
+```{r}
+hp_data %>% ggplot(aes(sample=price_range)) + stat_qq() + stat_qq_line() + ggtitle('QQ plot of price changes')
+```
 
-
+From the QQ plot and the histogram, it is clear that the price changes are not normally distributed, but have long tails.  It would be interesting to understand why price changes have such extreme values.
