@@ -24,18 +24,10 @@ library(RCurl) #getURL
 
 # use XML package
 # this leads to an error :-(
-#rest1 <-   getURL("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%wFrestaurants.xml")
+#rest1 <-   getURL("https://www.w3schools.com/xml/simple.xml")
 #doc <- xmlParse(rest1)
 
-# use rvest
-#hp <- read_html("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%wFrestaurants.xml")
-
-#https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml
-#https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml
-#https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml
-
 restaurants_url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml"
-
 hp <- read_html(restaurants_url)
 ```
 
