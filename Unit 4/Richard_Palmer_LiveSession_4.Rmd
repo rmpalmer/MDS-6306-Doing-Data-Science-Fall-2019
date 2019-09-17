@@ -44,8 +44,9 @@ all_restaurants <- data.frame(hp_name,hp_zip,hp_ccd)
 
 Look for sushi restaurants.
 ```{r}
-sushi_indices <- grep("sushi",all_restaurants$hp_name,ignore.case=TRUE) 
-total_sushi <- length(sushi_indices)
+sushi_restaurants <- grep("sushi",all_restaurants$hp_name,ignore.case=TRUE,value=TRUE) 
+sushi_restaurants
+total_sushi <- length(sushi_restaurants)
 ```
 
 There appear to be `r total_sushi` Sushi restaurants in Baltimore.
@@ -55,6 +56,8 @@ Now look only downtown
 downtown_restaurants <- all_restaurants %>% filter(hp_ccd == 11)
 dt_sushi_indices <- grep("sushi",downtown_restaurants$hp_name,ignore.case=TRUE) 
 total_dt_sushi <- length(dt_sushi_indices)
+dt_sushi <- grep("sushi",downtown_restaurants$hp_name,ignore.case=TRUE,value=TRUE)
+dt_sushi
 ```
 
 There is/are `r total_dt_sushi` sushi restaurants downtown.  
