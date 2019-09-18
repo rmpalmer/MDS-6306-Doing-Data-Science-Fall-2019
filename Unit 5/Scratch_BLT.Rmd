@@ -1,0 +1,95 @@
+---
+title: "Scratch_BLT"
+author: "Richard Palmer"
+date: "9/18/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(tidyr)
+library(stringi)
+library(rvest) #html_table, html_node
+library(ggplot2)
+library(maps)
+library(mapproj)
+library(countrycode)
+library(WDI)
+library(WHO)
+library(plotly)
+```
+
+Do something 
+```{r}
+#Dataframe for the Example
+id  = c(1,2,3,4,5,6)
+age = c(22,21,24,19,20,23,NA)
+yrs_math_ed = c(4,5,2,5,3,5,NA)
+names = c("Mary","Martha","Kim","Kristen","Amy","Sam","Bivin")
+subject = c("English","Math","Sociology","Math","Music","Dance","DS")
+df1 = data.frame(id=c(id,99),Age = age, Years = yrs_math_ed,Name = names, Major = subject)
+
+states = c("TX","OK","AL","MS","WA","CA")
+df2 = data.frame(id,states)
+
+merge(df1,df2,by="id",all=TRUE)
+
+```
+
+```{r}
+tmp = data.frame(abb=state.abb,State=state.name)
+lookup <- cbind(tmp,seq(1,50)) %>% mutate (region=tolower(State))
+```
+
+```{r}
+map.df <- map_data("state")
+stuff <- merge(map.df,lookup,by="region",all.x=T)
+ggplot(stuff, aes(x=long,y=lat,group=group)) + 
+  geom_polygon(aes(fill=order)) +
+  geom_path()+
+  scale_fill_gradientn(colours=rev(heat.colors(10)),na.value="grey90")+ggtitle("foobar")
+```
+
+
+```{r}
+GDPPC = WDI(indicator="NY.GDP.PCAP.KD",start=2015,end=2015)
+codes=get_codes()
+grep("life expect",codes$display)
+codes$display[58]
+codes$display[2187]
+codes$label[58]
+```
+
+```{r}
+LE=get_data("WHOSIS_000002")
+```
+
+```{r}
+LE$iso2c = countrycode(LE$country,"country.name","iso2c")
+```
+
+```{r}
+LE2 = LE %>% filter(sex=="Both sexes" & year == 2015)
+LE2
+```
+
+```{r}
+GDPPC2 = GDPPC[48:264,]
+GDPPC3 = GDPPC2[!is.na(GDPPC2$NY.GDP.PCAP.KD),]
+head(GDPPC3)
+```
+
+
+```{r}
+GDPPC_LE = left_join(LE2,GDPPC3,"iso2c") %>% select(country.x,NY.GDP.PCAP.KD,value,year.x)
+head(GDPPC_LE)
+```
+
+```{r}
+names(GDPPC_LE)[1] = "Country"
+ThePlot <- GDPPC_LE %>%
+  ggplot(aes(NY.GDP.PCAP.KD,value,color=Country)) + geom_point() + xlab("GDP per capita") + ylab("life expectancy") + ggtitle("way too much")
+ggplotly(ThePlot)
+```
