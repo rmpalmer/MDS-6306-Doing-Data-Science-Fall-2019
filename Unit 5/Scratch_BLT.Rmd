@@ -113,3 +113,26 @@ matchDF %>% ggplot(aes(x = Colors, fill = Colors)) + geom_bar()+ scale_fill_manu
 colors[order(colors)]
 matchDF %>% ggplot(aes(x = Colors, fill = Colors)) + geom_bar()+ scale_fill_manual(values=colors[order(colors)])
 ```
+
+```{r}
+author="( -| - )([^ ]{2,}) ([^ ]{2,})"
+authors=df$quotes
+authors %>% str_extract(author)
+authors %>% str_match(author)
+dfAuthors <- data.frame(authors %>% str_match(author))
+names(dfAuthors) =c("Full","Dash","First","Last")
+```
+
+
+```{r}
+roster = data.frame(Name = c("John", "Nancy", "Fred", "Sam", "Julie"), Gender = c("male", "F", "M", "Female", "female"), Major = c("?","Math","Comp Sci", "?", ""))
+
+# work on gender
+roster$Gender = str_replace(roster$Gender,"(\\bmale\\b|\\bM\\b)", "Male")
+roster$Gender = str_replace(roster$Gender,"(\\bfemale\\b|\\bF\\b)", "Female")
+roster$Gender = str_replace(roster$Gender,regex("\\bfemale\\b|\\bf\\b",ignore_case=TRUE),"Feale")
+roster$Gender = str_replace(roster$Gender,regex("\\bfemale\\b|\\bf\\b",ignore_case=TRUE),"Female")
+
+```
+
+
