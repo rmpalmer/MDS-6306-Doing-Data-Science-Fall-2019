@@ -125,6 +125,13 @@ top_girls
 write.csv(top_girls,file="PopularGirlNames.csv",quote=FALSE,row.names=FALSE)
 ```
 
+## Question 4
 
+```{r}
+library("poweRlaw")
+name_counts <- summed_and_sorted$Total
+nc_pl <- displ$new(name_counts)
+est = estimate_xmin(nc_pl)
+```
 
 
