@@ -177,6 +177,10 @@ nc_est
 ```
 
 ```{r}
+nc_p <- bootstrap_p(nc_pl,no_of_sims=10,threads=4)
+```
+
+```{r}
 plot(nc_pl)
 ```
 
@@ -193,5 +197,14 @@ m_est
 ```
 
 ```{r}
+m_p <- bootstrap_p(m_pl,no_of_sims=10,threads=4)
+```
+
+```{r}
 plot(m_pl)
+```
+
+```{r}
+bs_m <- bootstrap_p(m_pl,no_of_sims=10,threads=4)
+bs_m
 ```
