@@ -107,5 +107,24 @@ dim(final)[1]
 
 ## Question 3
 
+### total number of children from both years and sort by the total
 ```{r}
+summed_and_sorted <-  final %>% mutate(Total = count.x + count.y) %>% dplyr::arrange(desc(Total))
 ```
+
+### top ten names
+```{r}
+head(summed_and_sorted,10)
+```
+
+### top ten girl names
+```{r}
+top_girls <- summed_and_sorted %>% filter(gender == "f") %>% select(name,Total) %>% head(10)
+names(top_girls) = c("Name","Count")
+top_girls
+write.csv(top_girls,file="PopularGirlNames.csv",quote=FALSE,row.names=FALSE)
+```
+
+
+
+
