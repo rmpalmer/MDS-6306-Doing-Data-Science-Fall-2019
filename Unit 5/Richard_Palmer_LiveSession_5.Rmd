@@ -67,8 +67,45 @@ summary(yob2016)
 str(yob2016)
 ```
 
-## find the misspelling
+## Question 1
 ```{r}
 bad <- yob2016 %>% filter(grepl("yyy$",name,ignore.case = TRUE))
 as.character(bad$name)
+dim(yob2016)[1]
+y2016 <- yob2016 %>% filter(!grepl("yyy$",name,ignore.case=TRUE))
+dim(y2016)[1]
+
+```
+
+## Question 2
+
+### load the data
+```{r}
+y2015 <- read.csv(file='yob2015.txt',header=FALSE,sep=',')
+names(y2015) <- c("name","gender","count")
+tail(y2015,10)
+```
+
+It is interesting to note that the last five names all are male, and that they
+all have a count of 5.
+
+### join the lists, keeping only names that appear in both years
+
+We want to ignore case, so must change factor to string first, and convert back to Factor after
+
+```{r}
+tmp2016 <- y2016 %>% mutate(gender.name = tolower(paste(gender,name,sep="."))) %>% select(gender.name,count)
+tmp2015 <- y2015 %>% mutate(gender.name = tolower(paste(gender,name,sep="."))) %>% select(gender.name,count)
+
+final <- inner_join(tmp2015,tmp2016,by="gender.name") %>% 
+  separate(col=gender.name,into=c("gender","name"))
+
+dim(y2015)[1]
+dim(y2016)[1]
+dim(final)[1]
+```
+
+## Question 3
+
+```{r}
 ```
