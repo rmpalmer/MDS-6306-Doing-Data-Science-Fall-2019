@@ -1,0 +1,37 @@
+---
+title: "Unit5 PreLive"
+author: "Richard Palmer"
+date: "9/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# get libraries
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(ggalt)
+library(ggcorrplot)
+library(tidyr)
+library(stringr)
+```
+
+# Part 1
+
+## Get the data and compute height in inches
+```{r}
+# load data
+raw_ball <- read.csv(file="PlayersBBall.csv")
+# convert height to inches, compute years played
+BBall <- raw_ball %>% mutate(htc=as.character(height)) %>%
+  mutate (TotalInches = 12*as.numeric(str_extract(htc,"^[:digit:]+")) + as.numeric(str_extract(htc,"[:digit:]+$")) )
+BBall$position <- as.factor(BBall$position)
+```
+
+## histogram of heights
+```{r}
+BBall %>% drop_na(TotalInches) %>% ggplot(aes(x=TotalInches,color=position)) + 
+  geom_histogram() + facet_wrap(~position) + ggtitle('Histograms of Height in inches, by position')
+```
