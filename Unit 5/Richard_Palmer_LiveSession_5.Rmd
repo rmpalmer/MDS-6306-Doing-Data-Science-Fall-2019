@@ -56,3 +56,19 @@ FIFA %>% drop_na(TotalInches) %>% drop_na(TotalPounds) %>% ggplot(aes(x=TotalInc
 FIFA %>% filter(grepl("(LM|LB)",Position)) %>% drop_na(TotalInches) %>% drop_na(TotalPounds) %>%
   ggplot(aes(x=TotalInches,y=TotalPounds)) + geom_point() + facet_wrap(~Position)
 ```
+
+# Part 3
+
+## load the data
+```{r}
+yob2016 <- read.csv(file='yob2016.txt',header=FALSE,sep=";")
+names(yob2016) <- c("name","gender","count")
+summary(yob2016)
+str(yob2016)
+```
+
+## find the misspelling
+```{r}
+bad <- yob2016 %>% filter(grepl("yyy$",name,ignore.case = TRUE))
+as.character(bad$name)
+```
