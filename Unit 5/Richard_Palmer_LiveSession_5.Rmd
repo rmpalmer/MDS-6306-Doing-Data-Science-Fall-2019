@@ -35,3 +35,24 @@ BBall$position <- as.factor(BBall$position)
 BBall %>% drop_na(TotalInches) %>% ggplot(aes(x=TotalInches,color=position)) + 
   geom_histogram() + facet_wrap(~position) + ggtitle('Histograms of Height in inches, by position')
 ```
+
+# Part 2
+
+## Get the data, drop observations for which we cannot compute height or weight
+```{r}
+fifa_raw <- read.csv(file='FIFA Players.csv')
+FIFA <- fifa_raw %>% mutate(htc=as.character(Height)) %>% mutate(wtc=as.character(Weight)) %>%
+  mutate (TotalInches = 12*as.numeric(str_extract(htc,"^[:digit:]+")) + as.numeric(str_extract(htc,"[:digit:]+$")) ) %>%
+  mutate (TotalPounds = as.numeric(str_extract(wtc,"^[:digit:]+"))) 
+```
+
+## Try a little EDA
+```{r}
+FIFA %>% drop_na(TotalInches) %>% drop_na(TotalPounds) %>% ggplot(aes(x=TotalInches,y=TotalPounds)) + geom_point() + facet_wrap(~Position)
+```
+
+## limit to only LB and LM positions
+```{r}
+FIFA %>% filter(grepl("(LM|LB)",Position)) %>% drop_na(TotalInches) %>% drop_na(TotalPounds) %>%
+  ggplot(aes(x=TotalInches,y=TotalPounds)) + geom_point() + facet_wrap(~Position)
+```
