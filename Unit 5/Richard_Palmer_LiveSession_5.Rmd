@@ -200,8 +200,8 @@ The bootstrap_p function create a p-value for testing the hypothesis that the da
 came from a power distribution.  For the moby dick words, the p value is relatively
 high, indicating that a power law distribution is an appropriate model.
 ```{r}
-m_p <- bootstrap_p(m_pl,no_of_sims=10,threads=4)
-m_p$p
+#m_p <- bootstrap_p(m_pl,no_of_sims=10,threads=4)
+#m_p$p
 
 ```
 
@@ -217,6 +217,6 @@ lines(nc_pl,col=2)
 
 
 ```{r}
-nc_p <- bootstrap_p(nc_pl,no_of_sims=10,threads=4)
-nc_p$p
+#nc_p <- bootstrap_p(nc_pl,no_of_sims=10,threads=4)
+#nc_p$p
 ```
