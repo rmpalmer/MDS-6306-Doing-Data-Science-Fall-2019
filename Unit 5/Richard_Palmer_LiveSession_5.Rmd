@@ -60,7 +60,7 @@ FIFA %>% drop_na(TotalInches) %>% drop_na(TotalPounds) %>% ggplot(aes(x=TotalInc
 ```
 
 ```{r}
-FIFA %>% select(TotalInches,TotalPounds) drop_na(TotalInches) %>% drop_na(TotalPounds) %>% ggpairs()
+FIFA %>% select(TotalInches,TotalPounds) %>% drop_na(TotalInches) %>% drop_na(TotalPounds) %>% ggpairs()
 ```
 
 ## limit to only LB and LM positions
