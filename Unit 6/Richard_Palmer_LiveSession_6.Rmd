@@ -1,0 +1,222 @@
+---
+title: "Unit5 PreLive"
+author: "Richard Palmer"
+date: "9/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# get libraries
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(ggalt)
+library(ggcorrplot)
+library(tidyr)
+library(stringr)
+library(GGally)
+```
+
+# Part 1
+
+## Get the data and compute height in inches
+```{r}
+# load data
+raw_ball <- read.csv(file="PlayersBBall.csv")
+# convert height to inches, compute years played
+BBall <- raw_ball %>% mutate(htc=as.character(height)) %>%
+  mutate (TotalInches = 12*as.numeric(str_extract(htc,"^[:digit:]+")) + as.numeric(str_extract(htc,"[:digit:]+$")) )
+BBall$position <- as.factor(BBall$position)
+```
+
+## histogram of heights
+```{r}
+BBall %>% drop_na(TotalInches) %>% ggplot(aes(x=TotalInches,fill=position)) + 
+  geom_histogram() + facet_wrap(~position) + ggtitle('Histograms of Height in inches, by position')
+```
+
+# Part 2
+
+## Get the data, drop observations for which we cannot compute height or weight
+```{r}
+fifa_raw <- read.csv(file='FIFA Players.csv')
+FIFA <- fifa_raw %>% mutate(htc=as.character(Height)) %>% mutate(wtc=as.character(Weight)) %>%
+  mutate (TotalInches = 12*as.numeric(str_extract(htc,"^[:digit:]+")) + as.numeric(str_extract(htc,"[:digit:]+$")) ) %>%
+  mutate (TotalPounds = as.numeric(str_extract(wtc,"^[:digit:]+"))) 
+```
+
+## Try a little EDA
+
+Make a plot over all positions, with a smooth trend line
+```{r}
+FIFA %>% drop_na(TotalInches) %>% drop_na(TotalPounds) %>% ggplot(aes(x=TotalInches,y=TotalPounds)) + geom_point() + geom_jitter(width=0.1,height=0.1) + geom_smooth() + ggtitle("Weight Versus Height for all positions, with smoothed trend line")
+```
+
+Now make separate scatter plots for each position
+```{r}
+FIFA %>% drop_na(TotalInches) %>% drop_na(TotalPounds) %>% ggplot(aes(x=TotalInches,y=TotalPounds)) + geom_point() + facet_wrap(~Position) + ggtitle("Weight versus height by position")
+```
+
+```{r}
+FIFA %>% select(TotalInches,TotalPounds) %>% drop_na(TotalInches) %>% drop_na(TotalPounds) %>% ggpairs()
+```
+
+## limit to only LB and LM positions
+```{r}
+FIFA %>% filter(grepl("(LM|LB)",Position)) %>% drop_na(TotalInches) %>% drop_na(TotalPounds) %>%
+  ggplot(aes(x=TotalInches,y=TotalPounds)) + geom_point() + geom_smooth() + facet_wrap(~Position) + ggtitle("Weight versus Height for LB and LM positions")
+```
+
+# Part 3
+
+## load the data
+```{r}
+df <- read.csv(file='yob2016.txt',header=FALSE,sep=";")
+names(df) <- c("name","gender","count")
+summary(df)
+str(df)
+```
+
+## Question 1
+```{r}
+bad <- df %>% filter(grepl("yyy$",name,ignore.case = TRUE))
+as.character(bad$name)
+dim(df)[1]
+y2016 <- df %>% filter(!grepl("yyy$",name,ignore.case=TRUE))
+dim(y2016)[1]
+
+```
+
+## Question 2
+
+### load the data
+```{r}
+y2015 <- read.csv(file='yob2015.txt',header=FALSE,sep=',')
+names(y2015) <- c("name","gender","count")
+tail(y2015,10)
+```
+
+It is interesting to note that the last five names all are male, and that they
+all have a count of 5.
+
+### join the lists, keeping only names that appear in both years
+
+We want to ignore case, so must change factor to string first, and convert back to Factor after.
+We also want to handle the combination of gender+name, rather than just name, so that for instance,
+we handle the male name of Lee separately from the female name of Lee.
+```{r}
+tmp2016 <- y2016 %>% mutate(gender.name = tolower(paste(gender,name,sep="."))) %>% select(gender.name,count)
+tmp2015 <- y2015 %>% mutate(gender.name = tolower(paste(gender,name,sep="."))) %>% select(gender.name,count)
+
+final <- inner_join(tmp2015,tmp2016,by="gender.name") %>% 
+  separate(col=gender.name,into=c("gender","name"))
+
+dim(y2015)[1]
+dim(y2016)[1]
+dim(final)[1]
+```
+
+## Question 3
+
+### total number of children from both years and sort by the total
+```{r}
+summed_and_sorted <-  final %>% mutate(Total = count.x + count.y) %>% dplyr::arrange(desc(Total))
+```
+
+### top ten names
+```{r}
+head(summed_and_sorted,10)
+```
+
+### top ten girl names
+```{r}
+top_girls <- summed_and_sorted %>% filter(gender == "f") %>% select(name,Total) %>% head(10)
+names(top_girls) = c("Name","Count")
+top_girls
+write.csv(top_girls,file="PopularGirlNames.csv",quote=FALSE,row.names=FALSE)
+```
+
+## Question 4
+
+I was curious about the relative frequencies of names, and so started out making histograms
+```{r}
+final %>% mutate(Total = count.x + count.y) %>% dplyr::arrange(desc(Total)) %>% arrange(Total) %>%
+  ggplot(aes(x=Total)) + geom_histogram() + ggtitle('Histogram of all counts')
+```
+
+There are some very common names dominating the distribution, so I dropped the top 100
+```{r}
+final %>% mutate(Total = count.x + count.y) %>% dplyr::arrange(desc(Total)) %>% arrange(Total) %>% head (-100) %>%
+  ggplot(aes(x=Total)) + geom_histogram() + ggtitle('Histogram after dropping 100 most common')
+```
+
+The distribution looks very similar
+```{r}
+final %>% mutate(Total = count.x + count.y) %>% dplyr::arrange(desc(Total)) %>% arrange(Total) %>% head (-500) %>%
+  ggplot(aes(x=Total)) + geom_histogram() + ggtitle('Histogram after dropping 500 most common')
+```
+
+So I drop more
+```{r}
+final %>% mutate(Total = count.x + count.y) %>% dplyr::arrange(desc(Total)) %>% arrange(Total) %>% head (-1000) %>%
+  ggplot(aes(x=Total)) + geom_histogram() + ggtitle('Histogram after dropping 1000 most common')
+```
+
+only when dropping the 5000 most common names 
+```{r}
+final %>% mutate(Total = count.x + count.y) %>% dplyr::arrange(desc(Total)) %>% arrange(Total) %>% head (-5000) %>%
+  ggplot(aes(x=Total)) + geom_histogram() + ggtitle('Histogram after dropping 5000 most common')
+```
+
+does a histogram show significant detail in the distribution, and it is still a very skewed distribution.
+
+This behavior is reminiscent of a power law distribution.  This is a widely oberved phenomenon in nature.
+The idea is that the frequency of an event is inversely proportional to its size.  Events such as 
+earthquakes follow such a distribution.  It is related to fractals, in that the same pattern is 
+apparent at many different scales.
+
+I discovered an R package that can test data to see if it was generated by a power law.
+It does a 'goodness of fit' test, using a bootstrapping procedure, to generate a p-value 
+to test the hypothesis that the data were generated from a power-law distribution.
+
+The package comes with a sample dataset, which is the frequency of unqiue words in the novel 'Moby Dick'.
+Here is a basic analysis of that dataset.
+
+```{r}
+library("poweRlaw")
+data("moby",package="poweRlaw")
+m_pl <- displ$new(moby)
+est <- estimate_xmin(m_pl)
+m_pl$setXmin(est)
+plot(m_pl)
+lines(m_pl,col=2)
+```
+
+This is a plot of the log of 
+
+The bootstrap_p function create a p-value for testing the hypothesis that the data
+came from a power distribution.  For the moby dick words, the p value is relatively
+high, indicating that a power law distribution is an appropriate model.
+```{r}
+#m_p <- bootstrap_p(m_pl,no_of_sims=10,threads=4)
+#m_p$p
+
+```
+
+Now, to return to baby names, here is the same analysis.
+```{r}
+name_counts <- summed_and_sorted$Total
+nc_pl <- displ$new(name_counts)
+est <- estimate_xmin(nc_pl)
+nc_pl$setXmin(est)
+plot(nc_pl)
+lines(nc_pl,col=2)
+```
+
+
+```{r}
+#nc_p <- bootstrap_p(nc_pl,no_of_sims=10,threads=4)
+#nc_p$p
+```

@@ -245,6 +245,11 @@ knn(iris[,c(1,2)], df, iris$Species, k = 3, prob = TRUE)
 knn(iris[,c(1,2)], df, iris$Species, k = 15, prob = TRUE)
 ```
 
+```{r}
+iris_cross_validate <- knn.cv(iris[,c(1,2)],iris$Species,k=90)
+confusionMatrix(iris_cross_validate,iris$Species)
+```
+
 # Archeology
 ```{r}
 pottery = read.csv(file.choose(),header = TRUE)
