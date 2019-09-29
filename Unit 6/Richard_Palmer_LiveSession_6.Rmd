@@ -64,3 +64,14 @@ all_predictions <- knn(passenger_valid[,1:2],passenger_valid[,1:2], passenger_va
 cm <- confusionMatrix(all_predictions,as.factor(passenger_valid$fields.survived))
 cm
 ```
+
+# Part 2
+
+## split the data up
+```{r}
+set.seed(42)
+splitPerc = .7
+trainIndices = sample(1:dim(iris)[1],round(splitPerc * dim(iris)[1]))
+train = iris[trainIndices,]
+test = iris[-trainIndices,]
+```
