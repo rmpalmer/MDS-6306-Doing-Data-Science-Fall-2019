@@ -29,7 +29,7 @@ dfTrain %>% ggplot(aes(x = CreditRating, y = income, color = Qualify)) + geom_po
 
 dfTest = data.frame(income = 92, CreditRating = 694)
 
-knn(dfTrain[,1:2], dfTest, dfTrain$Qualify, k = 5, prob = TRUE)
+knn(dfTrain[,1:2], dfTest, dfTrain$Qualify, k = 3, prob = TRUE)
 ```
 
 
