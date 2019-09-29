@@ -18,13 +18,49 @@ library(class)
 library(XML) #xml_Parse
 library(RCurl) #getURL
 library(jsonlite)
-
+library(rvest)
 ```
 
 # Part 1
 
 ## Get the data 
 ```{r}
+passengers_url <- "https://public.opendatasoft.com/api/records/1.0/search/?dataset=titanic-passengers&rows=2000&facet=survived&facet=pclass&facet=sex&facet=age&facet=embarked"
+passenger_json <- jsonlite::fromJSON(passengers_url,flatten=TRUE)
+passenger_df <- passenger_json$records
+passenger_valid <- passenger_df %>% select(fields.age,fields.pclass,fields.survived) %>%
+  drop_na()
+```
+
+## Construct a KNN classifier using age and class
+```{r}
+#test different values of k.  3 seems pretty good
+prediction <- knn(passenger_valid[,1:2],passenger_valid[,1:2],passenger_valid$fields.survived,k=3)
+confusionMatrix(prediction,as.factor(passenger_valid$fields.survived))
+```
+
+```{r}
+myself <- data.frame(fields.age = 56, fields.pclass = c(1,2,3))
+prediction <- knn(passenger_valid[,1:2],myself,passenger_valid$fields.survived,k=3,prob=TRUE)
+prediction
+```
+
+A 56 year old passenger is predicted to survive if in first class, but not if
+in second or third class.
+
+## get the list of passengers for whom to predict outcomes and predict
+```{r}
+titanic_raw <- read.csv('titanic_test.csv')
+titanic_test <- titatic_raw %>% rename(fields.age = Age, fields.pclass = Pclass) %>% 
+  select(fields.age,fields.pclass) %>% drop_na()
+prediction <- knn(passenger_valid[,1:2],titanic_test,passenger_valid$fields.survived)
 
 ```
 
+
+## for a confusion matrix, check predictions on all passengers
+```{r}
+all_predictions <- knn(passenger_valid[,1:2],passenger_valid[,1:2], passenger_valid$fields.survived,k=3) 
+cm <- confusionMatrix(all_predictions,as.factor(passenger_valid$fields.survived))
+cm
+```
