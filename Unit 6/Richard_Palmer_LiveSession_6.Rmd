@@ -11,17 +11,19 @@ knitr::opts_chunk$set(echo = TRUE)
 # get libraries
 library(dplyr)
 library(ggplot2)
-library(plotly)
-library(ggalt)
-library(ggcorrplot)
-library(tidyr)
+library(tidyverse)
 library(stringr)
-library(GGally)
+library(caret)
+library(class)
+library(XML) #xml_Parse
+library(RCurl) #getURL
+library(jsonlite)
+
 ```
 
 # Part 1
 
-## Get the data and compute height in inches
+## Get the data 
 ```{r}
 
 ```
