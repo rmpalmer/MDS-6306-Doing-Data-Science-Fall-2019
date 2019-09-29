@@ -252,12 +252,13 @@ confusionMatrix(iris_cross_validate,iris$Species)
 
 # Archeology
 ```{r}
-pottery = read.csv(file.choose(),header = TRUE)
+raw <-  read.csv(file.choose(),header = TRUE)
+pottery <- raw %>% drop_na()
 pottery
-confusionMatrix(table(knn.cv(pottery[,1:5],pottery$Site, k = 3), pottery$Site))
+confusionMatrix(table(knn.cv(pottery[,3:7],pottery$Site, k = 3), pottery$Site))
 QOI = data.frame(Al = 21, Fe = 6.7, Mg = 4.9, Ca = 0.10, Na = 0.11)
-knn(pottery[,1:5],QOI,pottery$Site, prob = TRUE, k = 3)
-knn(pottery[,1:5],QOI,pottery$Site, prob = TRUE, k = 5)
+knn(pottery[,3:7],QOI,pottery$Site, prob = TRUE, k = 3)
+knn(pottery[,3:7],QOI,pottery$Site, prob = TRUE, k = 5)
 ```
 
 
