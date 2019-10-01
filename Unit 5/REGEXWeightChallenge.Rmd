@@ -1,0 +1,34 @@
+---
+title: "NameWeight"
+author: "Richard Palmer"
+date: "9/29/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+setwd("/cloud/project/Unit 5")
+```
+
+```{r}
+cleanit <- function() 
+{
+return(NameWeights %>% mutate (TotalPounds = as.numeric(str_extract(as.character(weight),"^[:digit:]+"))) %>% select(-weight))
+}
+```
+
+## Read in the data
+```{r}
+NameWeights = read.csv('REGEXWeightChallenge.csv')
+```
+
+```{r}
+result = NameWeights %>% 
+  mutate (TotalPounds = as.numeric(str_extract(as.character(weight),"^[:digit:]+"))) %>%
+  select(-weight)
+```
+
+```{r}
+foo <- cleanit()
+```

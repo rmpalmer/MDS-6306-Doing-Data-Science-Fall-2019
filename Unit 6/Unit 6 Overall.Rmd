@@ -29,7 +29,7 @@ dfTrain %>% ggplot(aes(x = CreditRating, y = income, color = Qualify)) + geom_po
 
 dfTest = data.frame(income = 92, CreditRating = 694)
 
-knn(dfTrain[,1:2], dfTest, dfTrain$Qualify, k = 5, prob = TRUE)
+knn(dfTrain[,1:2], dfTest, dfTrain$Qualify, k = 3, prob = TRUE)
 ```
 
 
@@ -245,14 +245,20 @@ knn(iris[,c(1,2)], df, iris$Species, k = 3, prob = TRUE)
 knn(iris[,c(1,2)], df, iris$Species, k = 15, prob = TRUE)
 ```
 
+```{r}
+iris_cross_validate <- knn.cv(iris[,c(1,2)],iris$Species,k=90)
+confusionMatrix(iris_cross_validate,iris$Species)
+```
+
 # Archeology
 ```{r}
-pottery = read.csv(file.choose(),header = TRUE)
+raw <-  read.csv(file.choose(),header = TRUE)
+pottery <- raw %>% drop_na()
 pottery
-confusionMatrix(table(knn.cv(pottery[,1:5],pottery$Site, k = 3), pottery$Site))
+pot_cf <- confusionMatrix(table(knn.cv(pottery[,3:7],pottery$Site, k = 3), pottery$Site))
 QOI = data.frame(Al = 21, Fe = 6.7, Mg = 4.9, Ca = 0.10, Na = 0.11)
-knn(pottery[,1:5],QOI,pottery$Site, prob = TRUE, k = 3)
-knn(pottery[,1:5],QOI,pottery$Site, prob = TRUE, k = 5)
+knn(pottery[,3:7],QOI,pottery$Site, prob = TRUE, k = 3)
+knn(pottery[,3:7],QOI,pottery$Site, prob = TRUE, k = 5)
 ```
 
 
