@@ -145,7 +145,7 @@ cv_df %>% ggplot(aes(x=k,y=Accuracy)) +
 ## more
 ```{r}
 cv_max_index <- which.max(meanacc)
-cc_max_accuracy <- max(meanacc)
+cv_max_accuracy <- max(meanacc)
 ```
 
 Using leave one out cross validation, the peak Accuracy of `r cv_max_accuracy`
