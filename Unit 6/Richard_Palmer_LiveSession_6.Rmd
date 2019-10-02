@@ -100,14 +100,20 @@ for (j in 1:iterations)
 ## analyze the result
 ```{r}
 meanacc <- colMeans(acc_tt)
-plot(seq(1,numks,1),meanacc,type="l")
+train_test_df <- as.data.frame(cbind(seq(1,numks,1),colMeans(acc_tt)))
+names(train_test_df) <- c("k", "Accuracy")
+train_test_df %>% ggplot(aes(x=k,y=Accuracy)) + 
+  geom_point() + ggtitle("Accuracy vs k for Train/Test split") + xlab("k") + ylab("Accuracy")
 ```
 
 ## more
 ```{r}
-which.max(meanacc)
-max(meanacc)
+tt_max_index <- which.max(meanacc)
+tt_max_accuracy <- max(meanacc)
 ```
+
+Using the train/test cross validation, the peak Accuracy of `r tt_max_accuracy`
+is found at k=`r tt_max_index`
 
 ## run the trials
 ```{r}
@@ -127,13 +133,20 @@ for (j in 1:iterations)
 ```{r}
 meanacc <- colMeans(acc_icv)
 plot(seq(1,numks,1),meanacc,type="l")
+
+meanacc <- colMeans(acc_icv)
+cv_df <- as.data.frame(cbind(seq(1,numks,1),colMeans(acc_icv)))
+names(cv_df) <- c("k", "Accuracy")
+cv_df %>% ggplot(aes(x=k,y=Accuracy)) + 
+  geom_point() + ggtitle("Accuracy vs k for Leave-One-Out") + xlab("k") + ylab("Accuracy")
+
 ```
 
 ## more
 ```{r}
-which.max(meanacc)
-max(meanacc)
+cv_max_index <- which.max(meanacc)
+cc_max_accuracy <- max(meanacc)
 ```
 
-
-
+Using leave one out cross validation, the peak Accuracy of `r cv_max_accuracy`
+is found at k=`r cv_max_index`

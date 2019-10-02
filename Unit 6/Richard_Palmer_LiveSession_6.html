@@ -388,33 +388,33 @@ confusionMatrix(prediction,as.factor(passenger_valid$fields.survived))</code></p
 ## 
 ##           Reference
 ## Prediction  No Yes
-##        No  360 104
-##        Yes  64 186
+##        No  364 104
+##        Yes  60 186
 ##                                           
-##                Accuracy : 0.7647          
-##                  95% CI : (0.7318, 0.7954)
+##                Accuracy : 0.7703          
+##                  95% CI : (0.7377, 0.8007)
 ##     No Information Rate : 0.5938          
 ##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
 ##                                           
-##                   Kappa : 0.5014          
+##                   Kappa : 0.5121          
 ##                                           
-##  Mcnemar's Test P-Value : 0.002622        
+##  Mcnemar's Test P-Value : 0.0007858       
 ##                                           
-##             Sensitivity : 0.8491          
+##             Sensitivity : 0.8585          
 ##             Specificity : 0.6414          
-##          Pos Pred Value : 0.7759          
-##          Neg Pred Value : 0.7440          
+##          Pos Pred Value : 0.7778          
+##          Neg Pred Value : 0.7561          
 ##              Prevalence : 0.5938          
-##          Detection Rate : 0.5042          
-##    Detection Prevalence : 0.6499          
-##       Balanced Accuracy : 0.7452          
+##          Detection Rate : 0.5098          
+##    Detection Prevalence : 0.6555          
+##       Balanced Accuracy : 0.7499          
 ##                                           
 ##        'Positive' Class : No              
 ## </code></pre>
 <pre class="r"><code>myself &lt;- data.frame(fields.age = 56, fields.pclass = c(1,2,3))
 prediction &lt;- knn(passenger_valid[,1:2],myself,passenger_valid$fields.survived,k=3,prob=TRUE)
 prediction</code></pre>
-<pre><code>## [1] No No No
+<pre><code>## [1] Yes No  No 
 ## attr(,&quot;prob&quot;)
 ## [1] 0.5000000 0.5714286 0.7500000
 ## Levels: No Yes</code></pre>
@@ -436,26 +436,26 @@ cm</code></pre>
 ## 
 ##           Reference
 ## Prediction  No Yes
-##        No  364 100
-##        Yes  60 190
+##        No  362 104
+##        Yes  62 186
 ##                                          
-##                Accuracy : 0.7759         
-##                  95% CI : (0.7435, 0.806)
+##                Accuracy : 0.7675         
+##                  95% CI : (0.7348, 0.798)
 ##     No Information Rate : 0.5938         
 ##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16      
 ##                                          
-##                   Kappa : 0.5251         
+##                   Kappa : 0.5068         
 ##                                          
-##  Mcnemar's Test P-Value : 0.002048       
+##  Mcnemar's Test P-Value : 0.001462       
 ##                                          
-##             Sensitivity : 0.8585         
-##             Specificity : 0.6552         
-##          Pos Pred Value : 0.7845         
-##          Neg Pred Value : 0.7600         
+##             Sensitivity : 0.8538         
+##             Specificity : 0.6414         
+##          Pos Pred Value : 0.7768         
+##          Neg Pred Value : 0.7500         
 ##              Prevalence : 0.5938         
-##          Detection Rate : 0.5098         
-##    Detection Prevalence : 0.6499         
-##       Balanced Accuracy : 0.7568         
+##          Detection Rate : 0.5070         
+##    Detection Prevalence : 0.6527         
+##       Balanced Accuracy : 0.7476         
 ##                                          
 ##        'Positive' Class : No             
 ## </code></pre>

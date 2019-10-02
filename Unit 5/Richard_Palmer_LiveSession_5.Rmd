@@ -220,3 +220,15 @@ lines(nc_pl,col=2)
 #nc_p <- bootstrap_p(nc_pl,no_of_sims=10,threads=4)
 #nc_p$p
 ```
+
+
+```{r}
+raw <- round(100* rnorm(1000))
+floor = min(raw)
+my_normal <- raw - floor + 1
+norm_pl <- displ$new(my_normal)
+est <- estimate_xmin(norm_pl)
+norm_pl$setXmin(est)
+plot(norm_pl)
+lines(norm_pl,col=2)
+```
