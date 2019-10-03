@@ -1,0 +1,18 @@
+---
+title: "BLT_7"
+author: "R.M. Palmer"
+date: "10/3/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library('e1071')
+library('tidyverse')
+```
+
+## Naive Bayes
+
+```{r}
+vball = read.csv('Bayes Volleyball.csv')
+```
