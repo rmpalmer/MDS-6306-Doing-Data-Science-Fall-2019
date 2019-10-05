@@ -52,7 +52,8 @@ library(jsonlite)
 library(dplyr)
 library(tidyverse)
 
-NYTIMES_KEY = "OG89fUubcS8FXofVrLA4dmIOHh5omiFa" #Your Key Here … get from NTY API website
+#NYTIMES_KEY = "OG89fUubcS8FXofVrLA4dmIOHh5omiFa" #Your Key Here … get from NTY API website
+NYTIMES_KEY = "dMvtWEzhlkNUos8emIkheO2jX0tMTTvq"
 
 # Let's set some parameters
 term <- "Central+Park+Jogger" # Need to use + to string together separate words

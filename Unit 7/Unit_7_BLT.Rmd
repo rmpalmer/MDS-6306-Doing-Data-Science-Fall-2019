@@ -14,5 +14,7 @@ library('tidyverse')
 ## Naive Bayes
 
 ```{r}
-vball = read.csv('Bayes Volleyball.csv')
+vball <-read.csv('Bayes Volleyball.csv')
+model <- naiveBayes(Volleyball ~ ., data=vball) 
+predict(model,data.frame(Outlook='Sunny',Wind='Hi'),type="raw")
 ```
