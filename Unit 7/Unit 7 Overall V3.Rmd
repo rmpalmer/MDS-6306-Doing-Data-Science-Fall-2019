@@ -7,7 +7,7 @@ output: html_document
 
 #Volleyball Example
 ```{r}
-vball = read.csv(file.choose(),header = TRUE)
+vball = read.csv('Bayes Volleyball.csv',header = TRUE)
 vball
 
 install.packages("e1071") #naiveBayes()
@@ -37,9 +37,9 @@ predict(model,df, type = "raw") #gives probabilities
 # end_date <- "20190502"
 
 # Trump Search
-# term <- "Trump" # Need to use + to string together separate words
-# begin_date <- "20190415"
-# end_date <- "20190502"
+ term <- "Trump" # Need to use + to string together separate words
+ begin_date <- "20190415"
+ end_date <- "20190502"
 
 ######################
 
@@ -56,9 +56,9 @@ library(tidyverse)
 NYTIMES_KEY = "dMvtWEzhlkNUos8emIkheO2jX0tMTTvq"
 
 # Let's set some parameters
-term <- "Central+Park+Jogger" # Need to use + to string together separate words
-begin_date <- "19900419"
-end_date <- "19900619"
+#term <- "Data+Science" # Need to use + to string together separate words
+#begin_date <- "20180901"
+#end_date <- "20190502"
 
 baseurl <- paste0("http://api.nytimes.com/svc/search/v2/articlesearch.json?q=",term,
                   "&begin_date=",begin_date,"&end_date=",end_date,
