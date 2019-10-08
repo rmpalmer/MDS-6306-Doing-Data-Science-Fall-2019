@@ -1,0 +1,110 @@
+---
+title: "NYT Exercise"
+author: "Richard Palmer"
+date: "9/18/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyr)
+library(plyr)
+library(jsonlite)
+library(tm)
+NYTIMES_KEY = "dMvtWEzhlkNUos8emIkheO2jX0tMTTvq"
+```
+
+```{r}
+# Let's set some parameters
+term <- "Summer Temperature" # Need to use + to string together separate words
+
+begin_date <- "20190701"
+end_date <- "20190918"
+
+baseurl <- paste0("http://api.nytimes.com/svc/search/v2/articlesearch.json?q=",term,
+                  "&begin_date=",begin_date,"&end_date=",end_date,
+                  "&facet_filter=true&api-key=",NYTIMES_KEY, sep="")
+initialQuery <- jsonlite::fromJSON(baseurl)
+maxPages <- round((initialQuery$response$meta$hits[1] / 10)-1)
+pages <- list()
+for(i in 0:maxPages){
+  nytSearch <- jsonlite::fromJSON(paste0(baseurl, "&page=", i), flatten = TRUE) %>% data.frame() 
+  message("Retrieving page ", i)
+  pages[[i+1]] <- nytSearch 
+  Sys.sleep(10) 
+}
+
+allNYTSearch <- rbind_pages(pages)
+```
+
+```{r}
+allNYTSearch %>% 
+  group_by(response.docs.type_of_material) %>%
+  dplyr::summarize(count=n()) %>%
+  mutate(percent = (count / sum(count))*100) %>%
+  ggplot() +  geom_bar(aes(y=percent, x=response.docs.type_of_material, fill=response.docs.type_of_material), stat = "identity") + coord_flip()
+```
+
+```{r}
+allNYTSearch$NewsOrOther = ifelse(allNYTSearch$response.docs.type_of_material == "News","News","Other")
+```
+
+```{r}
+allNYTSearch[!is.na(allNYTSearch$NewsOrOther),] %>% 
+  group_by(NewsOrOther) %>%
+  dplyr::summarize(count=n()) %>%
+  mutate(percent = (count / sum(count))*100) %>%
+  ggplot() +
+  geom_bar(aes(y=percent, x=NewsOrOther, fill=NewsOrOther), stat = "identity") + coord_flip()
+```
+
+
+```{r}
+ArticleToClassify = allNYTSearch[10,]
+ArticleToClassify$response.docs.headline.main
+trueType <- allNYTSearch$response.docs.type_of_material[1]
+theText <- unlist(str_split(str_replace_all(ArticleToClassify$response.docs.headline.main,"[^[:alnum:] ]", ""), boundary("word")))
+wordsToTakeOut <- c(stopwords(),"Sailing")
+wordsToTakeOut <- str_c(wordsToTakeOut,collapse="\\b|\\b")
+wordsToTakeOut <- str_c("\\b",wordsToTakeOut,"\\b")
+importantWords <- theText[!str_detect(theText,regex(wordsToTakeOut,ignore_case = TRUE))]
+```
+
+```{r}
+newsArticles <- allNYTSearch %>% filter(NewsOrOther == "News")
+otherArticles <- allNYTSearch %>% filter(NewsOrOther == "Other")
+
+numNewsArticles  = dim(newsArticles)[1]
+numOtherArticles = dim(otherArticles)[1]
+
+thePercentHolderNews = c()
+thePercentHolderOther = c()
+
+for (i in 1:length(importantWords))
+{
+  numNews  = sum(str_count(newsArticles$response.docs.headline.main[-10],importantWords[i]))
+  newOther = sum(str_count(otherArticles$response.docs.headline.main[-10],importantWords[i]))
+  
+  thePercentHolderNews[i] = numNews/numNewsArticles
+  thePercentHolderOther[i] = newOther/numOtherArticles
+  
+  thePercentHolderNews
+  thePercentHolderOther
+}
+thePercentHolderNews
+thePercentHolderOther
+
+classifiedAs = if_else(sum(thePercentHolderNews)>sum(thePercentHolderOther),"News","Other")
+```
+
+```{r}
+articleStats = data.frame(Word=importantWords,newsScore = thePercentHolderNews,otherScore = thePercentHolderOther)
+
+articleStats
+```
+
+```{r}
+articleStats[,c(2,3)] %>% gather(Type,Percent) %>% mutate(Word = rep(articleStats$Word,2)) %>% ggplot(aes(y = Percent, x = Type, fill = Word)) + geom_col()
+articleStats[,c(2,3)] %>% gather(Type,Percent) %>% mutate(Word = rep(articleStats$Word,2)) %>% ggplot(aes(y = Percent, x = Type, fill = Word)) + geom_col() + facet_wrap(~Word)
+```
