@@ -62,11 +62,7 @@ head(testTitanic)
 
 ```{r}
 model_b <-  naiveBayes(trainTitanic[,pred_indices],trainTitanic$Survived)
-result_raw <- data.frame(predict(model_b,testTitanic[,pred_indices], type = "raw"))
-result_b <- result_raw %>% mutate(x = ifelse(Yes>No,'Yes','No')) %>%
-  mutate(Survived = as.factor(x))
-
-CM = confusionMatrix(result_b$Survived,testTitanic$Survived)
+CM = confusionMatrix(table(predict(model_b,testTitanic[,pred_indices]),as.factor(testTitanic$Survived)))
 CM
 ```
 
@@ -91,10 +87,8 @@ for (j in 1:iterations)
   trainTitanic = titanicClean[trainIndices,]
   testTitanic = titanicClean[-trainIndices,]
   model_c <- naiveBayes(trainTitanic[,pred_indices],trainTitanic$Survived)
-  result_raw <- data.frame(predict(model_c,testTitanic[,pred_indices], type = "raw"))
-  result_c <- result_raw %>% mutate(x = ifelse(Yes>No,'Yes','No')) %>%
-    mutate(Survived = as.factor(x))
-  CM_c <- confusionMatrix(result_c$Survived,testTitanic$Survived)
+  CM_c <- confusionMatrix(table(predict(model_c,testTitanic[,pred_indices]),as.factor(testTitanic$Survived)))
+                          
   acc_nb[j,1] <- CM_c$overall[1] # accuracy
   acc_nb[j,2] <- CM_c$byClass[1] # sensitivity
   acc_nb[j,3] <- CM_c$byClass[2] # specificity
@@ -124,10 +118,7 @@ for (j in 1:iterations)
   trainTitanic = titanicClean[trainIndices,]
   testTitanic = titanicClean[-trainIndices,]
   model_d <- naiveBayes(trainTitanic[,pred_indices],trainTitanic$Survived)
-  result_raw <- data.frame(predict(model_d,testTitanic[,pred_indices], type = "raw"))
-  result_d <- result_raw %>% mutate(x = ifelse(Yes>No,'Yes','No')) %>%
-    mutate(Survived = as.factor(x))
-  CM_d <- confusionMatrix(result_d$Survived,testTitanic$Survived)
+  CM_d <- confusionMatrix(table(predict(model_d,testTitanic[,pred_indices]),as.factor(testTitanic$Survived)))
   acc_nb[j,1] <- CM_d$overall[1] # accuracy
   acc_nb[j,2] <- CM_d$byClass[1] # sensitivity
   acc_nb[j,3] <- CM_d$byClass[2] # specificity
