@@ -79,6 +79,36 @@ knn_pred_titanic <- knn(trainTitanic[,1:2],
 CM_knn_titanic   <- confusionMatrix(knn_pred_titanic,testTitanic$Survived)
 CM_knn_titanic
 ```
+## Run a few times to see variability in statistics
+```{r}
+iterations = 5
+acc_nb = data.frame(nrow=iterations,ncol=4)
+
+for (j in 1:iterations)
+{
+  set.seed(j)
+  trainIndices = sample(seq(1:length(titanicClean$Age)),
+                        round(.7*length(titanicClean$Age)))
+  trainTitanic = titanicClean[trainIndices,]
+  testTitanic = titanicClean[-trainIndices,]
+  model_c <- naiveBayes(trainTitanic[,pred_indices],trainTitanic$Survived)
+  CM_c <- confusionMatrix(table(predict(model_c,testTitanic[,pred_indices]),
+                                as.factor(testTitanic$Survived)))
+            
+  acc_nb[j,1] <- j              
+  acc_nb[j,2] <- CM_c$overall[1] # accuracy
+  acc_nb[j,3] <- CM_c$byClass[1] # sensitivity
+  acc_nb[j,4] <- CM_c$byClass[2] # specificity
+}
+colnames(acc_nb) <- c("Trial","Accuracy","Sensitivity","Specificity")
+acc_nb %>% ggplot(aes(x=Trial)) + 
+  geom_line(aes(y=Accuracy)) +
+  geom_line(aes(y=Sensitivity)) +
+  geom_line(aes(y=Specificity)) +
+  xlab("Trial") + 
+  ylab("Rate") + 
+  ggtitle("Varying accuracy with different split trials")
+```
 
 ## Iterate with different seeds
 ```{r}
@@ -116,6 +146,20 @@ mean_sensitivity is `r mean_sensitivity`
 mean_specificity is `r mean_specificity`
 
 ## Now add sex to the model
+```{r}
+pred_indices=c("Age","Pclass","Sex")
+trainIndices = sample(seq(1:length(titanicClean$Age)),
+                        round(.7*length(titanicClean$Age)))
+trainTitanic = titanicClean[trainIndices,]
+testTitanic = titanicClean[-trainIndices,]
+model_d <- naiveBayes(trainTitanic[,pred_indices],trainTitanic$Survived)
+CM_d <- confusionMatrix(table(predict(model_d,
+                                      testTitanic[,pred_indices]),
+                                      as.factor(testTitanic$Survived)))
+CM_d
+```
+
+## Iterate with sex in the model
 ```{r}
 model_d = naiveBayes(titanicClean[,c(1,2,3)],titanicClean$Survived)
 pred_indices=c("Age","Pclass","Sex")
@@ -160,7 +204,7 @@ mean_specificity is `r mean_specificity`
 
 iterations = 100
 
-masterAccNB = matrix(nrow = iterations)
+masterAccNB = matrix(nrow = iterations,ncol=3)
 pred_indices=c("Sepal.Length","Sepal.Width")
 
 splitPerc = .7 #Training / Test split Percentage
@@ -179,7 +223,9 @@ for(j in 1:iterations)
   CM = confusionMatrix(table(predict(model,
                                      test[,pred_indices]),
                                      as.factor(test$Species)))
-  masterAccNB[j] = CM$overall[1]
+  masterAccNB[j,1] = CM$overall[1]
+  masterAccNB[j,2] = CM$byClass[1]
+  masterAccNB[j,3] = CM$byClass[2]
 }
 MeanAccNB = colMeans(masterAccNB)
 
@@ -187,13 +233,17 @@ MeanAccNB = colMeans(masterAccNB)
 From Naive Bayes to predict multinomial species,
 using a 70% train/test split and iterating 100 times, 
 
-Mean Accuracy is `r MeanAccNB`
+Mean Accuracy is `r MeanAccNB[1]`
+
+Mean Sensitivity is `r MeanAccNB[2]`
+
+Mean Specificity is `r MeanAccNB[3]`
 
 ## KNN for multinomial iris
 ```{r}
 # from Unit 6, peak accuracy was with k = 33
 my_k = 33
-acc_knn = matrix(nrow=iterations,ncol=1)
+acc_knn = matrix(nrow=iterations,ncol=3)
 of_interest <- iris %>% select(Sepal.Length,Sepal.Width,Species)
 for (j in 1:iterations)
 {
@@ -203,6 +253,8 @@ for (j in 1:iterations)
   classifications <- knn(train[,1:2],test[1:2],train[,3],k=my_k)
   cm = confusionMatrix(classifications,test$Species)
   acc_knn[j,1] = cm$overall[1]
+  acc_knn[j,2] = cm$byClass[1]
+  acc_knn[j,3] = cm$byClass[2]
 }
 MeanAccKnn = colMeans(acc_knn)
 
@@ -210,7 +262,13 @@ MeanAccKnn = colMeans(acc_knn)
 
 From KNN to predict multinomial species,
 using a 70% train/test split and iterating 100 times, 
-Mean Accuracy is `r MeanAccKnn`
+
+Mean Accuracy is `r MeanAccKnn[1]`
+
+Mean Sensitivity is `r MeanAccKnn[2]`
+
+Mean Specificity is `r MeanAccKnn[3]`
+
 
 
 
