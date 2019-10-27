@@ -1,0 +1,189 @@
+---
+title: "Unit 10 PreLive"
+author: "Richard Palmer"
+date: "10/31/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# get libraries
+library(tidyverse)
+library(caret)
+```
+
+# Part 1
+
+## Get the data 
+```{r}
+# convert weight to 1000 lb, to make numbers more interpretable
+# add in weight squared, since I know I will need that
+cars <- read.csv('cars.csv') %>% mutate(wt = Weight / 1000,wt2 = wt*wt)
+```
+
+## Fit a linear model
+
+```{r}
+model1 <- lm(MPG~wt, data = cars)
+summary(model1)
+```
+
+## Step 1 - Null and Alternative Hypotheses
+
+H0: MPG is not a linear function of Weight (The slope of the regression line for MPG as a function of Weight is 0)
+
+Ha: MPG is a linear function of Weight (The slope of the regression line for MPG as a function of Weight is not 0)
+
+## Step 2 - Find Critical Value of test statistic
+
+```{r}
+alpha <- 1 - .95
+dof <- model1$df
+tcrit <- abs(qt(alpha/2, dof)) 
+
+curve(dt(x,dof), xlim=c(-5,5),ylim=c(0,0.4), col='red',lwd=2)
+d = dt(tcrit,dof)
+abline(h=0)
+segments(-1*tcrit,0,-1*tcrit,d)
+segments(tcrit,0,tcrit,d)
+
+```
+There are `r dof` degrees of freedom, so for a 95% confidence level, the critical value of
+the T statistic is `r tcrit`
+
+## Step 3 - Compute test statistic
+```{r}
+# coefficient 1 is intercept; 2 is slope
+tvalue <- summary(model1)$coefficients[2,"t value"]
+```
+
+The T statistic is `r tvalue`
+
+## Step 4 - Find p-value
+```{r}
+# coefficient 1 is intercept; 2 is slope
+pvalue <- summary(model1)$coefficients[2,"Pr(>|t|)"]
+```
+
+The p value is `r pvalue`.  This is the probability of observing a
+slope of `r ` if the null hypothesis is true.
+
+## Step 5 - Reject or fail to reject Null hypothesis
+
+Reject the null hypothesis
+
+## Step 6 - conclusion
+
+```{r}
+slope_est <- summary(model1)$coefficients[2,"Estimate"]
+slope_se  <- summary(model1)$coefficients[2,"Std. Error"]
+slope_lo  <- slope_est - tvalue*slope_se
+slope_hi  <- slope_est + tvalue*slope_se
+```
+
+slope est is `r slope_est`  
+slope_se is  `r slope_se`  
+slope_lo is `r slope_lo`  
+slope_hi is `r slope_hi`  
+A 95% confidence interval for the slope of the regression line is
+[`r slope_lo` .. `r slope_hi`]
+
+## Interpretation
+
+# Part 2
+```{r}
+# use leave-one out cross validation from caret package
+train.control <- trainControl(method="LOOCV")
+new_car <- data.frame(wt = 2.000)
+model2 <- lm(MPG~wt+wt2, data = cars)
+```
+
+## Model 1
+```{r}
+# Train the model
+model1_loocv <- train(MPG ~ wt, data = cars, method = "lm",
+               trControl = train.control)
+# Summarize the results
+print(model1_loocv)
+summary(model1_loocv)
+```
+
+## Model 2
+```{r}
+# Train the model
+model2_loocv <- train(MPG ~ wt+wt2, data = cars, method = "lm",
+               trControl = train.control)
+# Summarize the results
+print(model2_loocv)
+summary(model2_loocv)
+```
+
+## Cross Validation
+
+## Interpretation
+
+## Prediction
+```{r}
+model1_pred <- predict(model1,new_car)
+model2_pred <- predict(model2,new_car)
+```
+
+The first order model predicts that a car with Weight `r 1000*new_car$wt` lb will 
+have fuel efficiency of `r model1_pred` mpg.
+
+The second order model predicts that a car with Weight `r 1000*new_car$wt` lb will 
+have fuel efficiency of `r model2_pred` mpg.
+
+# Part 3
+
+Check for missing values in any potential regressors
+
+```{r}
+missing_MPG  <- sum(is.na(cars$MPG))
+missing_Cyl  <- sum(is.na(cars$Cylinders))
+missing_Disp  <- sum(is.na(cars$Displacement))
+missing_Hp  <- sum(is.na(cars$Horsepower))
+missing_wt  <- sum(is.na(cars$Weight))
+missing_accel  <- sum(is.na(cars$Acceleration))
+missing_year  <- sum(is.na(cars$Year))
+
+missing_MPG 
+missing_Cyl
+missing_Disp
+missing_Hp  
+missing_wt  
+missing_accel
+missing_year 
+
+```
+
+## Impute missing HP values
+```{r}
+hp_model <- lm(Horsepower ~Cylinders+Displacement+Acceleration+Year+wt, 
+               data = cars, na.action = na.exclude)
+summary(hp_model)
+missing_hp_indices <- which(is.na(cars$Horsepower))
+fixed_cars <- cars
+fixed_cars[missing_hp_indices,'Horsepower'] <- predict(hp_model,cars[missing_hp_indices,])
+```
+
+## model MPG on HP
+```{r}
+model3 <- lm(MPG~Horsepower, data = fixed_cars)
+```
+
+## Interpretation
+
+## Prediction
+```{r}
+new_car <- data.frame(Horsepower = 250)
+new_mpg <- predict(model3,new_car)
+```
+
+A car with horsepower rated at `r new_car$Horsepower` is predicted to have fuel
+efficiency of `r new_mpg`
+
+
+
+
