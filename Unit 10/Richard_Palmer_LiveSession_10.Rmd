@@ -27,6 +27,7 @@ cars <- read.csv('cars.csv') %>% mutate(wt = Weight / 1000,wt2 = wt*wt)
 ```{r}
 model1 <- lm(MPG~wt, data = cars)
 summary(model1)
+model1.slope <- summary(model1)$coefficients[2,"Estimate"]
 ```
 
 ## Step 1 - Null and Alternative Hypotheses
@@ -49,8 +50,9 @@ segments(-1*tcrit,0,-1*tcrit,d)
 segments(tcrit,0,tcrit,d)
 
 ```
+
 There are `r dof` degrees of freedom, so for a 95% confidence level, the critical value of
-the T statistic is `r tcrit`
+the T statistic is +/- `r tcrit`
 
 ## Step 3 - Compute test statistic
 ```{r}
@@ -67,29 +69,31 @@ pvalue <- summary(model1)$coefficients[2,"Pr(>|t|)"]
 ```
 
 The p value is `r pvalue`.  This is the probability of observing a
-slope of `r ` if the null hypothesis is true.
+slope of `r model1.slope` if the null hypothesis is true.
 
 ## Step 5 - Reject or fail to reject Null hypothesis
 
-Reject the null hypothesis
+Because the absolute value of the test statistic is larger than the 
+critical value, reject the null hypothesis.
 
 ## Step 6 - conclusion
 
 ```{r}
 slope_est <- summary(model1)$coefficients[2,"Estimate"]
-slope_se  <- summary(model1)$coefficients[2,"Std. Error"]
-slope_lo  <- slope_est - tvalue*slope_se
-slope_hi  <- slope_est + tvalue*slope_se
+slope_ci  <- confint(model1, 'wt', level=0.95)
 ```
 
-slope est is `r slope_est`  
-slope_se is  `r slope_se`  
-slope_lo is `r slope_lo`  
-slope_hi is `r slope_hi`  
+The estimate of the slope is `r slope_est`  
+There is sufficient evidence to reject the hypothesis that the slope of the
+regression line is zero.  
+
 A 95% confidence interval for the slope of the regression line is
-[`r slope_lo` .. `r slope_hi`]
+[`r slope_ci[1]` .. `r slope_ci[2]`]
 
 ## Interpretation
+
+For every additional 1000 lb in weight, the mean fuel efficiency of 
+a car is estimated to drop by `r abs(slope_est)` mpg.
 
 # Part 2
 ```{r}
@@ -99,7 +103,7 @@ new_car <- data.frame(wt = 2.000) %>% mutate(wt2=wt*wt)
 model2 <- lm(MPG~wt+wt2, data = cars)
 ```
 
-## Model 1
+## Cross validation for Model 1
 ```{r}
 # Train the model
 model1_loocv <- train(MPG ~ wt, data = cars, method = "lm",
@@ -107,9 +111,11 @@ model1_loocv <- train(MPG ~ wt, data = cars, method = "lm",
 # Summarize the results
 print(model1_loocv)
 summary(model1_loocv)
+model1_loocv_rmse <- model1_loocv$results$RMSE
+model1_loocv_r2 <- model1_loocv$results$Rsquared
 ```
 
-## Model 2
+## Cross validation for Model 2
 ```{r}
 # Train the model
 model2_loocv <- train(MPG ~ wt+wt2, data = cars, method = "lm",
@@ -117,11 +123,21 @@ model2_loocv <- train(MPG ~ wt+wt2, data = cars, method = "lm",
 # Summarize the results
 print(model2_loocv)
 summary(model2_loocv)
+model2_loocv_rmse <- model2_loocv$results$RMSE
+model2_loocv_r2 <- model2_loocv$results$Rsquared
+
 ```
 
-## Cross Validation
+For model 1, rms error is `r model1_loocv_rmse` and r squared is `r model1_loocv_r2`  
+For model 2, rms error is `r model2_loocv_rmse` and r squared is `r model2_loocv_r2`  
+
+Model2 is favored.
 
 ## Interpretation
+
+The relationship between weight and fuel efficiency now has two slopes, one for
+the linear contribution (weight), and one for the quadratic contribution (weight squared).  
+It is no longer possible to describe this relationship so simply.
 
 ## Prediction
 ```{r}
@@ -177,18 +193,16 @@ model3 <- lm(MPG~Horsepower, data = fixed_cars)
 ```{r}
 # coefficient 1 is intercept; 2 is slope
 pvalue <- summary(model3)$coefficients[2,"Pr(>|t|)"]
-slope_est <- summary(model3)$coefficients[2,"Estimate"]
-slope_se  <- summary(model3)$coefficients[2,"Std. Error"]
-slope_lo  <- slope_est - tvalue*slope_se
-slope_hi  <- slope_est + tvalue*slope_se
+new_slope_est <- summary(model3)$coefficients[2,"Estimate"]
+new_slope_ci  <- confint(model3, 'Horsepower', level=0.95)
 ```
 
-slope est is `r slope_est`  
-slope_se is  `r slope_se`  
-slope_lo is `r slope_lo`  
-slope_hi is `r slope_hi`  
+For every additional unit of horsepower, the fuel efficiency of 
+a car is predicted to decrease by 
+`r abs(new_slope_est)` mpg.
+
 A 95% confidence interval for the slope of the regression line is
-[`r slope_lo` .. `r slope_hi`]
+[`r new_slope_ci[1]` .. `r new_slope_ci[2]`]
 
 
 ## Prediction
@@ -198,7 +212,7 @@ new_mpg <- predict(model3,new_car)
 ```
 
 A car with horsepower rated at `r new_car$Horsepower` is predicted to have fuel
-efficiency of `r new_mpg`
+efficiency of `r new_mpg`.
 
 
 
