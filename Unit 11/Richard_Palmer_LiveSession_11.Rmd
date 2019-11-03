@@ -14,35 +14,23 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 install.packages("fpp")
 library(fpp)
-```
-
-## 1. SES MODEL FOR AUS AIR 
-
-```{r}
 data(ausair)
-```
 
 ##returns a ts object
 
-```{r}
 air = window(ausair, start = 1990, end = 2004)
-```
 
 ## Always plot the data first! 
 
-```{r}
 plot(air,ylab = "Airline Passegners", xlab = "Year", main = "Airline Passengers")
-```
 
 ##fit 3 different simple exponential smoothing models ... how are they different?
 
 ## what does the h paramter do? 
 
-```{r}
 fit1 = ses(air, initial = "simple",alpha = .2,h = 3)
 fit2 = ses(air,initial = "simple",alpha = .6, h = 3)
 fit3 = ses(air, h = 3) 
-```
 
 ##defaults
 
@@ -50,15 +38,12 @@ fit3 = ses(air, h = 3)
 
 ## the model and the data!  (This is the "training" data)
 
-```{r}
 accuracy(fit1, ausair)
 accuracy(fit2, ausair)
 accuracy(fit3, ausair)
-```
 
 ## Reset the plot
 
-```{r}
 plot(air,ylab = "Airline Passegners", xlab = "Year", type = "o", xlim = c(1990, 2008),ylim = c(15,50), main = "Airline Passengers")
 ##Plot the estimated values from the models .. the "fitted" values are the training values.
 lines(fitted(fit1), col = "blue", type = "o")
@@ -76,12 +61,9 @@ lines(fit3$mean, col = "green", type = "o")
 air2008 = window(ausair, start = 1990, end = 2007)
 points(air2008, type = "o")
 
-```
-
 
 ## Compare the forecasts with the actual values with various fit metrics.  
 
-```{r}
 accuracy(fit1, air2008)
 accuracy(fit2, air2008)
 accuracy(fit3, air2008)
@@ -89,6 +71,7 @@ accuracy(fit3, air2008)
 
 # Activity two
 
+```{r}
 ##2 Holt's Linear Trend Model for AUS AIR
 
 fit1h = holt(air, alpha = .8, beta = .2, initial = "simple", h = 5)
@@ -158,8 +141,10 @@ accuracy(fit3h, airTest)
 air2008 = window(ausair, start = 1990, end = 2009)
 points(air2008, type = "o")
 
-# Activity Three
+```
 
+# Activity Three
+```{r}
 # Seasonal Trend
 
 ## Load the data
@@ -187,7 +172,7 @@ fit2s = hw(aust,seasonal = "multiplicative",h = 40)
 
 ## Plot the original data
 
-plot(aust,ylab = "Australian Tourists", xlab = "Year", type = "o", xlim = c(1999, 2014),ylim = c(15,60))
+plot(aust,ylab = "Australian Tourists", xlab = "Year", type = "o", xlim = c(1999, 2014),ylim = c(15,60))
 
 ## add the fitted values from the model (of the training data)
 
@@ -208,3 +193,4 @@ accuracy(fit2s,austourists)
 ## add the actual values to visually compare the forecasts to the actual values. 
 
 points(austourists, type = "o")
+```
