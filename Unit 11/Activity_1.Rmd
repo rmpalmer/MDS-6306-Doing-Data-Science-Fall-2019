@@ -23,6 +23,7 @@ air = window(ausair, start = 1990, end = 2004)
 ## Always plot the data first! 
 
 plot(air,ylab = "Airline Passegners", xlab = "Year", main = "Airline Passengers")
+legend(1990,35,legend=c("original data"),col=c("black"),lty=1)
 
 ##fit 3 different simple exponential smoothing models ... how are they different?
 
@@ -31,6 +32,8 @@ plot(air,ylab = "Airline Passegners", xlab = "Year", main = "Airline Passengers"
 fit1 = ses(air, initial = "simple",alpha = .2,h = 3)
 fit2 = ses(air,initial = "simple",alpha = .6, h = 3)
 fit3 = ses(air, h = 3) 
+fit4 = ses(air, initial="simple",alpha=0.1, h=3)
+fit5 = ses(air, initial="simple",alpha=0.9, h=3)
 
 ##defaults
 
@@ -41,6 +44,8 @@ fit3 = ses(air, h = 3)
 accuracy(fit1, ausair)
 accuracy(fit2, ausair)
 accuracy(fit3, ausair)
+accuracy(fit4, ausair)
+accuracy(fit5, ausair)
 
 ```
 
@@ -48,16 +53,25 @@ accuracy(fit3, ausair)
 ## Reset the plot
 
 plot(air,ylab = "Airline Passegners", xlab = "Year", type = "o", xlim = c(1990, 2008),ylim = c(15,50), main = "Airline Passengers")
+legend(1990,50,
+       legend=c("original","0.2","0.6","def","0.1","0.9"),
+       col=c("black","blue","red","green","yellow","pink"),
+       lty=1)
+
 ##Plot the estimated values from the models .. the "fitted" values are the training values.
 lines(fitted(fit1), col = "blue", type = "o")
 lines(fitted(fit2), col = "red", type = "o")
 lines(fitted(fit3), col = "green", type = "o")
+lines(fitted(fit4), col="yellow",type="o")
+lines(fitted(fit5), col="pink",type="o")
 
 ## the  $mean values are the forecasts.
 
 lines(fit1$mean, col = "blue", type = "o")
 lines(fit2$mean, col = "red", type = "o")
 lines(fit3$mean, col = "green", type = "o")
+lines(fit4$mean, col="yellow",type="o")
+lines(fit5$mean, col="pink",type="o")
 
 ## These are the actual values!  Compare visually with the forecasts!
 
@@ -70,4 +84,29 @@ points(air2008, type = "o")
 accuracy(fit1, air2008)
 accuracy(fit2, air2008)
 accuracy(fit3, air2008)
+accuracy(fit4, air2008)
+accuracy(fit5, air2008)
+
+## try many different alphas
+alphas = seq(0,1,0.05)
+rmse_train <- vector(length=length(alphas))
+rmse_test  <- vector(length=length(alphas))
+i <- 0
+for (alpha in alphas)
+{
+  i <- i+1
+  fit = ses(air, initial = "simple",alpha = alpha,h = 3)
+  acc <- accuracy(fit,air2008)
+  rmse_train[i] <- acc["Training set","RMSE"]
+  rmse_test[i] <- acc["Test set","RMSE"]
+}
+errs <- data.frame(alphas, rmse_train, rmse_test)
+
+library(tidyverse)
+errs %>% ggplot() +  
+  geom_line(aes(x=alphas,y=rmse_train),color="red") +
+  geom_line(aes(x=alphas,y=rmse_test),color="blue") +
+  xlab('alpha') + ylab('mean squared error') +
+  ggtitle("red:train, blue:test")
+  
 ```

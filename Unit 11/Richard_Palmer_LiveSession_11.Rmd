@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Activity One
 
 ```{r}
-install.packages("fpp")
+# install.packages("fpp")
 library(fpp)
 data(ausair)
 
@@ -26,7 +26,7 @@ plot(air,ylab = "Airline Passegners", xlab = "Year", main = "Airline Passengers"
 
 ##fit 3 different simple exponential smoothing models ... how are they different?
 
-## what does the h paramter do? 
+## what does the h parameter do? 
 
 fit1 = ses(air, initial = "simple",alpha = .2,h = 3)
 fit2 = ses(air,initial = "simple",alpha = .6, h = 3)
@@ -42,6 +42,9 @@ accuracy(fit1, ausair)
 accuracy(fit2, ausair)
 accuracy(fit3, ausair)
 
+```
+
+```{r}
 ## Reset the plot
 
 plot(air,ylab = "Airline Passegners", xlab = "Year", type = "o", xlim = c(1990, 2008),ylim = c(15,50), main = "Airline Passengers")

@@ -25,7 +25,7 @@ data("austourists")
 
 ## Always plot the data first!
 
-plot(austourists)
+plot(austourists,main="Original data",xlab="year",ylab="Austrailian Tourists")
 
 ## returns a ts object.  
 
@@ -39,7 +39,11 @@ fit2s = hw(aust,seasonal = "multiplicative",h = 40)
 
 ## Plot the original data
 
-plot(aust,ylab = "Australian Tourists", xlab = "Year", type = "o", xlim = c(1999, 2014),ylim = c(15,60))
+plot(aust,ylab = "Australian Tourists",
+     xlab = "Year",
+     type = "o",
+     xlim = c(1999, 2014),ylim = c(15,60),
+     main="Fitting Seasonal Trends")
 
 ## add the fitted values from the model (of the training data)
 
@@ -60,4 +64,9 @@ accuracy(fit2s,austourists)
 ## add the actual values to visually compare the forecasts to the actual values. 
 
 points(austourists, type = "o")
+legend(1999,60,
+       legend=c("original","additive","multiplicative"),
+       col=c("black","blue","red"),
+       lty=1)
+
 ```
