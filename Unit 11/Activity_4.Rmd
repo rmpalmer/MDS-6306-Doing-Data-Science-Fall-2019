@@ -16,6 +16,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 # install.packages("fpp")
 library(fpp2)
+library(tidyverse)
+library(modelr)
+library(DescTools)
 data(maxtemp)
 temps <- window(maxtemp, start = 1990)
 orig_df <- data.frame(temps,year=trunc(time(temps)))
@@ -24,13 +27,19 @@ orig_df <- data.frame(temps,year=trunc(time(temps)))
 ## Simple Exponential Smoothing
 
 ```{r}
-alpha <- 0.2
+alpha <- 0.5
 
 ses_model <- ses(temps, initial = "simple",alpha = alpha,h = 5)
 ses_fit   <- fitted(ses_model)
 ses_df    <- data.frame(ses_fit,year=trunc(time(ses_fit)))
 predict   <- ses_model$mean
 pred_df   <- data.frame(predict,year=trunc(time(predict)))
+```
+
+## measures of error
+```{r}
+ses_model$model
+MSE(ses_model$fitted,temps)
 ```
 
 ## plot original and ses result
@@ -43,19 +52,28 @@ orig_df %>% mutate(what='Recorded',val=temps) %>%
   geom_line() +
   ggtitle('Recorded, Smoothed, and Predicted Temperatures from SES') +
   xlab('year') +
-  ylab('Temp (C)')
+  ylab('Temp (C)') +
+  scale_color_manual(values=c("green","red","blue"))
 ```
 
 ## Holt's Linear Trend
 
 ```{r}
-alpha <- 0.8
+alpha <- 0.5
 beta  <- 0.4
 holt_model <- holt(temps, alpha = alpha, beta = beta, initial = "optimal", damped=TRUE, h = 5)
 holt_fit   <- fitted(holt_model)
 holt_df    <- data.frame(holt_fit,year=trunc(time(holt_fit)))
 predict   <- holt_model$mean
 pred_df   <- data.frame(predict,year=trunc(time(predict)))
+```
+
+## measures of error
+```{r}
+holt_model$model
+MSE(holt_model$fitted,temps)
+AIC(holt_model$model)
+BIC(holt_model$model)
 ```
 
 ## Plot original and holt result
@@ -67,6 +85,8 @@ orig_df %>% mutate(what='Recorded',val=temps) %>%
   geom_line() +
   ggtitle('Recorded, Smoothed, and Predicted Temperatures from Holt') +
   xlab('year') +
-  ylab('Temp (C)')
+  ylab('Temp (C)') +
+  scale_color_manual(values=c("green","red","blue"))
+
 ```
 
