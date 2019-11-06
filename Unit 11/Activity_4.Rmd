@@ -27,30 +27,30 @@ orig_df <- data.frame(temps,year=trunc(time(temps)))
 ## Simple Exponential Smoothing
 
 ```{r}
-alpha <- 0.5
+alpha <- 0.4
 
-ses_model <- ses(temps, initial = "simple",alpha = alpha,h = 5)
+ses_model <- ses(temps, initial = "optimal",alpha = alpha,h = 5)
 ses_fit   <- fitted(ses_model)
 ses_df    <- data.frame(ses_fit,year=trunc(time(ses_fit)))
 predict   <- ses_model$mean
 pred_df   <- data.frame(predict,year=trunc(time(predict)))
-```
-
-## measures of error
-```{r}
-ses_model$model
-MSE(ses_model$fitted,temps)
+# measures of error
+#ses_model$model
+cat("From SES with alpha",alpha,"\n")
+cat("MSE",MSE(ses_model$fitted,temps),"\n")
+cat("AIC",AIC(ses_model$model),"\n")
+cat("BIC",BIC(ses_model$model),"\n")
 ```
 
 ## plot original and ses result
 
 ```{r}
 orig_df %>% mutate(what='Recorded',val=temps) %>%
-  bind_rows(ses_df %>% mutate(what='Smoothed',val=ses_fit)) %>%
-  bind_rows(pred_df %>% mutate(what='Predicted',val=predict)) %>%
+  bind_rows(ses_df %>% mutate(what='Predicted',val=ses_fit)) %>%
+  bind_rows(pred_df %>% mutate(what='Forecast',val=predict)) %>%
   ggplot(aes(y=val,x=year,color=what)) + 
   geom_line() +
-  ggtitle('Recorded, Smoothed, and Predicted Temperatures from SES') +
+  ggtitle('Recorded, Predicted, and Forecast Temperatures from SES') +
   xlab('year') +
   ylab('Temp (C)') +
   scale_color_manual(values=c("green","red","blue"))
@@ -59,31 +59,30 @@ orig_df %>% mutate(what='Recorded',val=temps) %>%
 ## Holt's Linear Trend
 
 ```{r}
-alpha <- 0.5
+alpha <- 0.4
 beta  <- 0.4
-holt_model <- holt(temps, alpha = alpha, beta = beta, initial = "optimal", damped=TRUE, h = 5)
+holt_model <- holt(temps, alpha = alpha, beta = beta,
+                   initial = "optimal", damped=TRUE, h = 5)
 holt_fit   <- fitted(holt_model)
 holt_df    <- data.frame(holt_fit,year=trunc(time(holt_fit)))
 predict   <- holt_model$mean
 pred_df   <- data.frame(predict,year=trunc(time(predict)))
-```
-
-## measures of error
-```{r}
-holt_model$model
-MSE(holt_model$fitted,temps)
-AIC(holt_model$model)
-BIC(holt_model$model)
+# measures of error
+# holt_model$model
+cat("From Holt with alpha",alpha,"beta",beta,"\n")
+cat("MSE",MSE(holt_model$fitted,temps),"\n")
+cat("AIC",AIC(holt_model$model),"\n")
+cat("BIC",BIC(holt_model$model),"\n")
 ```
 
 ## Plot original and holt result
 ```{r}
 orig_df %>% mutate(what='Recorded',val=temps) %>%
-  bind_rows(holt_df %>% mutate(what='Smoothed',val=holt_fit)) %>%
-  bind_rows(pred_df %>% mutate(what='Predicted',val=predict)) %>%
+  bind_rows(holt_df %>% mutate(what='Prediction',val=holt_fit)) %>%
+  bind_rows(pred_df %>% mutate(what='Forecast',val=predict)) %>%
   ggplot(aes(y=val,x=year,color=what)) + 
   geom_line() +
-  ggtitle('Recorded, Smoothed, and Predicted Temperatures from Holt') +
+  ggtitle('Recorded, Predicted, and Forecast Temperatures from Holt') +
   xlab('year') +
   ylab('Temp (C)') +
   scale_color_manual(values=c("green","red","blue"))
