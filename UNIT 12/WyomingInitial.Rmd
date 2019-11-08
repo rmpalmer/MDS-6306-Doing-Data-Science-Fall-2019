@@ -21,7 +21,12 @@ ui <- fluidPage(
                   label="Number of bins:",
                   min=1,
                   max=50,
-                  value=30)
+                  value=30),
+      selectInput(inputId="select",label=h3("Eruption or Waiting"),
+                  choices=list("Eruptions" = "eruptions", "Waiting" = "waiting"),
+                  selected=1),
+                  hr(),
+                  fluidRow(column(3,verbatimTextOutput("value")))
     ),
     mainPanel(
       plotOutput(outputId="distPlot")
@@ -31,12 +36,24 @@ ui <- fluidPage(
 
 server <- function(input,output) {
   output$distPlot <- renderPlot({
+    if (input$select == "waiting")
+    {
     x <- faithful$waiting
     bins <- seq(min(x),max(x),length.out=input$bins+1)
     hist(x,breaks=bins,col="#75AADB",border="white",
          xlab="Waiting time",
          main="Histogram of waiting times")
-  })
+    }
+    if (input$select == "eruptions")
+    {
+    x <- faithful$eruptions
+    bins <- seq(min(x),max(x),length.out=input$bins+1)
+    hist(x,breaks=bins,col="#75AADB",border="white",
+         xlab="Eruption time",
+         main="Histogram of eruption times")
+    }
+  }
+)
 }
 
 shinyApp(ui,server)
